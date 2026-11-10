@@ -1,6 +1,7 @@
 // Wiring helper for the in-app updater (the UI stage calls this; the screens live elsewhere).
 import 'dart:io';
 
+import 'package:flutter/foundation.dart' show kReleaseMode;
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
@@ -11,7 +12,8 @@ import 'guncelleyici.dart';
 
 /// DEVELOPMENT / end-to-end trial only: `--dart-define=GUNCELLEME_TABAN=http://10.0.2.2:8123` builds an
 /// app whose updater talks to tool/e2e/guncelleme_sahte_github.py instead of GitHub. Never set for a release.
-const _guncellemeTaban = String.fromEnvironment('GUNCELLEME_TABAN');
+// Ignored in release builds, so a stray define can never open plain HTTP or another host there.
+const _guncellemeTaban = kReleaseMode ? '' : String.fromEnvironment('GUNCELLEME_TABAN');
 
 Ag guncellemeAgi(String surum) => _guncellemeTaban.isEmpty
     ? Ag(surum: surum)

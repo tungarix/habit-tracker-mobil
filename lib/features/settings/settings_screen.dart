@@ -6,6 +6,7 @@ import '../../core/constants.dart';
 import '../../data/providers.dart';
 import '../../data/sync/sync_export.dart';
 import '../../data/sync/sync_format.dart';
+import '../../platform/yedek_denetimi.dart';
 import '../../shared/tema_modu.dart';
 import 'backup_file_service.dart';
 import 'guncelleme_bolumu.dart';
@@ -71,6 +72,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     try {
       final content = await ref.read(backupFileServiceProvider).pickBackup();
       if (content == null) return; // cancelled
+      yedekAlanlariniDenetle(content); // before anything is asked or changed
       final mode = await _askMergeOrReplace();
       if (mode == null) return;
       final r = await ref
