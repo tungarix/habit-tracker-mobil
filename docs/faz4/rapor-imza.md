@@ -26,8 +26,8 @@ Push, etiket, uzak depo, GitHub isteği, yayın: **yok**. Commit mesajında Clau
 
 ## Anahtar
 
-- Özel anahtar: `C:\Users\Arda\Documents\HabitTracker-anahtar\guncelleme-ozel-anahtar.b64` (44 karakter, base64 tohum).
-  Klasör ve dosya yalnız `DESKTOP-NUUAJN3\Arda` tam yetkili (icacls ile görüldü). Repo, log, rapor, commit içinde yok
+- Özel anahtar: `Documents\HabitTracker-anahtar\guncelleme-ozel-anahtar.b64` (44 karakter, base64 tohum).
+  Klasör ve dosya yalnız `yalnız bu Windows kullanıcısı` tam yetkili (icacls ile görüldü). Repo, log, rapor, commit içinde yok
   (depoda özel anahtar metni için tarama yapıldı: eşleşme yok).
 - Açık anahtar `lib/data/update/imza.dart` içinde gömülü. Gerçek anahtarla betik uçtan uca denendi (imzala, gömülü açık
   anahtarla doğrulandı).

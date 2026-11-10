@@ -1,6 +1,6 @@
 # Masaüstü uygulama içi güncelleme: rapor
 
-Çalışma yeri: `C:\Users\Arda\Desktop\Aktenak\Projeler\habit-tracker-guncelleme-calisma` (worktree, yerel dal `masaustu-guncelleme`, `mobil-senkron-v5` ucundan). Masaüstü master (`habit-tracker`) ve gerçek veri dokunulmadı. Hiçbir şey yayımlanmadı: push, etiket, release, GitHub isteği, imza anahtarı yok. İki yerel commit (`b4138e2`, `e0075fd`), mesajlarda Claude/Co-Authored-By yok.
+Çalışma yeri: `habit-tracker-guncelleme-calisma` (worktree, yerel dal `masaustu-guncelleme`, `mobil-senkron-v5` ucundan). Masaüstü master (`habit-tracker`) ve gerçek veri dokunulmadı. Hiçbir şey yayımlanmadı: push, etiket, release, GitHub isteği, imza anahtarı yok. İki yerel commit (`b4138e2`, `e0075fd`), mesajlarda Claude/Co-Authored-By yok.
 
 ## Yapılanlar
 

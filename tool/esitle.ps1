@@ -4,7 +4,7 @@
 #
 # Özet (SHA-256) satır sonları LF'ye çevrilerek hesaplanır: Windows (CRLF) ve CI (LF) aynı sonucu versin.
 param(
-    [string]$Kaynak = 'C:\Users\Arda\Desktop\Aktenak\Projeler\habit-tracker',
+    [string]$Kaynak = (Join-Path $PSScriptRoot '..\..\habit-tracker'),
     # Henüz atılmamış bir etiketi (örn. v1.4.0) hedefle: kaynak_ozet.json'a o ad + yerel commit SHA'sı yazılır.
     # Etiket kaynakta varsa normal yol işler (etiketle karşılaştırılır).
     [string]$Etiket = ''

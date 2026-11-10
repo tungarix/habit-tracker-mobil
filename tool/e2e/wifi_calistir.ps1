@@ -3,7 +3,7 @@
 # Yalnız kendi başlattığı süreci PID ile kapatır. Gerçek %APPDATA% verisine dokunmaz. flutter_tester çökmesinde
 # ("did not complete") yeniden dener; gerçek test hatasında denemez.
 param(
-    [string]$Masaustu = 'C:\Users\Arda\Desktop\Aktenak\Projeler\habit-tracker-v5-calisma',
+    [string]$Masaustu = (Join-Path $PSScriptRoot '..\..\..\habit-tracker'),
     [int]$Port = 48731,
     [int]$Deneme = 4
 )

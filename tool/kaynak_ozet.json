@@ -1,10 +1,10 @@
 {
   "kaynak": "tungarix/habit-tracker",
-  "kaynak_commit": "201e736c96a486beca9435f0a480ce19edf59e20",
+  "kaynak_commit": "fb9d77b065658ff17e49ec7e8ef9cd528be5e496",
   "etiket": "v1.4.0",
-  "etiketle_ayni": false,
-  "yayimlandi": false,
-  "not": "v1.4.0 (etiketlenecek): kaynak yerel commit 201e736; etiket henüz yok. Arda etiketi AYNI commit'e atınca CI uyum bekçisi yeşile döner; etiketten önce kaynağa yeni commit eklenirse esitle yeniden çalıştırılmalı.",
+  "etiketle_ayni": true,
+  "yayimlandi": true,
+  "not": "",
   "dosyalar": {
     "docs/senkron.md": "c83a90207911590018667cc3484dcc6c3b3cc2609b6b2d78224564532307df80",
     "lib/core/constants.dart": "071a6f4fe57626736c0c87266c52b840aa68b64a38e6be84be1b3215c51f4f74",

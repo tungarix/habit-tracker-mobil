@@ -67,7 +67,7 @@ Hâlâ açık (karar verilmedi, ben kapatmadım):
 ## e) Yayın sırası (hiçbiri yapılmadı; push, etiket, release, secret ben yapmam)
 
 Arda'nın yapacakları:
-1. **Özel anahtarın ikinci yedeği.** `C:\Users\Arda\Documents\HabitTracker-anahtar\guncelleme-ozel-anahtar.b64` dosyasını bu diskten ve repolardan bağımsız bir yere kopyala (şifreli USB ya da parola yöneticisi notu). Kaybolursa güncelleme zinciri kopar.
+1. **Özel anahtarın ikinci yedeği.** `Documents\HabitTracker-anahtar\guncelleme-ozel-anahtar.b64` dosyasını bu diskten ve repolardan bağımsız bir yere kopyala (şifreli USB ya da parola yöneticisi notu). Kaybolursa güncelleme zinciri kopar.
 2. **GitHub secret `HABIT_UPDATE_SIGNING_KEY`.** Masaüstü repoda (`tungarix/habit-tracker`) Settings > Secrets and variables > Actions; değer o dosyanın içeriği. Sır yoksa `release.yml` imza adımında düşer, release oluşmaz.
 3. **Etiket.** Önce masaüstü `master`'ı push et, sonra `v1.4.0` etiketini `kaynak_ozet.json`'daki `kaynak_commit` ile AYNI commit'e at. Etiketten önce masaüstüne yeni commit girerse (özellikle `lib/core`, `lib/data`, `test`, `docs/senkron.md`) `tool/esitle.ps1 -Etiket v1.4.0` yeniden çalıştırılmalı. Release iş akışı zip + `SHA256SUMS.txt` + `.sig` üretir; taslak release'i kontrol et.
 4. **Telefon denemesi** (yukarıdaki c listesi; özellikle 11 ve 12: gerçek kamerayla QR, Wi-Fi, Güvenlik Duvarı sorusu, uygulama içi güncelleme).
