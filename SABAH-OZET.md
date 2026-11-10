@@ -41,7 +41,7 @@ Bu turda koşulanlar: `flutter pub get` tamam; `flutter analyze` temiz (tek uyar
 ## d) Karar bekleyenler
 
 - Uygulama adı: şu an "Habit Tracker" (manifest etiketi). Kimlikler (`com.aktenak.habit_tracker`) sabit kalacak.
-- Dokunma alanı: planda Aylık hücre 44 px ile genel kural 48 dp çelişiyor; testler Aylık'ı 48 dp'den muaf tutuyor. Karar sende.
+- Dokunma alanı: Aylık hücre 48 dp yapıldı (karar kapandı), erişilebilirlik testinde muafiyet yok.
 - Plan dışı izinler: `FOREGROUND_SERVICE`, `WAKE_LOCK`, `VIBRATE` birleşik manifestte var (paket bağımlılıklarından geliyor). Plan "ön plan servisi yok" diyor; kaldırılsın mı, kalsın mı?
 - Kaynak etiketi ve masaüstü v1.4.0 zamanı: `kaynak_ozet.json` etiketi v1.3.3, ama v5 kodu yayımlanmamış dalda. v1.4.0 çıkana dek mobil CI etiket denetiminde kırmızı olur.
 - Mobil repo adı ve açılışı: `tungarix/habit-tracker-mobil`, public, MIT (plan kararı); açılış zamanı sende.
