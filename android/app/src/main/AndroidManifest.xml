@@ -1,8 +1,26 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Update check and download (only when the user turns it on). Flutter does not add INTERNET to
+         the release manifest itself; without it the updater silently fails. Plain HTTP is off. -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- Tell Wi-Fi from mobile data (default: download on Wi-Fi only). -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <!-- Install the downloaded, verified APK through the system install dialog. -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
+    <!-- Android 13+: runtime permission for the evening reminder and the focus-timer notification. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <!-- Re-arm scheduled notifications after a reboot. -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <!-- Exact focus-timer alarm: USE_EXACT_ALARM on Android 13+ (granted automatically; the Play
+         restriction does not apply to sideloaded builds), SCHEDULE_EXACT_ALARM on Android 12 only. -->
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM"/>
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" android:maxSdkVersion="32"/>
+
     <application
         android:label="Habit Tracker"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:allowBackup="false"
+        android:usesCleartextTraffic="false">
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -30,6 +48,34 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+        <!-- Install session result (own app only; PackageInstaller calls it through our PendingIntent). -->
+        <receiver android:name=".KurulumAlici" android:exported="false"/>
+
+        <!-- Home-screen widget. -->
+        <receiver android:name=".HabitWidgetProvider" android:exported="true" android:label="@string/widget_baslik">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/habit_widget_info"/>
+        </receiver>
+        <!-- Widget tap -> Dart background callback. exported=false is enough: the widget reaches it through
+             an explicit PendingIntent, and no other app may inject check marks. -->
+        <receiver android:name="es.antonborri.home_widget.HomeWidgetBackgroundReceiver" android:exported="false">
+            <intent-filter>
+                <action android:name="es.antonborri.home_widget.action.BACKGROUND"/>
+            </intent-filter>
+        </receiver>
+
+        <!-- Scheduled notifications (flutter_local_notifications) and their re-arming after reboot / app update. -->
+        <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver"/>
+        <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
+                <action android:name="android.intent.action.QUICKBOOT_POWERON"/>
+                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON"/>
+            </intent-filter>
+        </receiver>
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and

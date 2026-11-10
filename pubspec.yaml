@@ -26,6 +26,12 @@ dependencies:
   intl: ^0.20.2
   # Yedeği sistem Paylaş menüsüyle dışa aktarma (Takvim'deki sürüm).
   share_plus: ^13.3.1
+  # Android platform layer (lib/platform). drift_flutter: shared database server isolate for the widget.
+  drift_flutter: ^0.3.1
+  home_widget: ^0.10.0
+  # Same major as Takvim (22.x): 23.x needs an AGP/Gradle toolchain that is not in the local cache.
+  flutter_local_notifications: ^22.3.3
+  timezone: ^0.11.2
 
 dev_dependencies:
   flutter_test:

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_arkaplan"
+    android:orientation="vertical"
+    android:padding="8dp">
+
+    <TextView
+        android:id="@+id/widget_baslik"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="48dp"
+        android:gravity="center_vertical"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:text="@string/widget_baslik"
+        android:textColor="#FFFFFFFF"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/widget_bos"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="48dp"
+        android:gravity="center_vertical"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:text="@string/widget_bos"
+        android:textColor="#FFD0D0D8"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/widget_satir0"
+        style="@style/WidgetSatir" />
+
+    <TextView
+        android:id="@+id/widget_satir1"
+        style="@style/WidgetSatir" />
+
+    <TextView
+        android:id="@+id/widget_satir2"
+        style="@style/WidgetSatir" />
+
+    <TextView
+        android:id="@+id/widget_satir3"
+        style="@style/WidgetSatir" />
+
+    <TextView
+        android:id="@+id/widget_satir4"
+        style="@style/WidgetSatir" />
+
+    <TextView
+        android:id="@+id/widget_fazla"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="48dp"
+        android:gravity="center_vertical"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:textColor="#FFD0D0D8"
+        android:textSize="14sp" />
+</LinearLayout>

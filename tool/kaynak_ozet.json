@@ -36,5 +36,13 @@
     "test/tasks_test.dart": "c4a45d35ab3a03904d4481019b68c23b8d0340a6d034a62a0a5aac15f5ec11c5",
     "test/widget_test.dart": "9e4fa4f0cac58a2d3b39d3f2dd594d9cdcdbdf87572a8fbdb10b95100628d09c"
   },
-  "bilincli_sapmalar": []
+  "bilincli_sapmalar": [],
+  "bilincli_farklar": [
+    {
+      "konu": "Veritabanı bağlantısı",
+      "dosya": "lib/platform/db_baglanti.dart",
+      "kaynak_dosya": "lib/data/database/database.dart",
+      "gerekce": "Masaüstündeki _openConnection her isolate için ayrı NativeDatabase açar; WAL/busy_timeout yok. Ana ekran widget'ı arka plan isolate'inden yazarken UI açıksa 'database is locked' alınır ve UI'daki watch() akışları öbür bağlantının yazmasını görmez (test/db_paylasim_test.dart kontrol testi bunu gösterir). Mobil bağlantı drift_flutter driftDatabase(shareAcrossIsolates: true) ile açılır: AppDatabase.forTesting(dbBaglantisi()). database.dart kopyası DEĞİŞMEDİ (özet tutuyor); sapma, uygulamanın varsayılan AppDatabase() yerine bu kurucuyu kullanmasıdır (databaseProvider override edilir)."
+    }
+  ]
 }

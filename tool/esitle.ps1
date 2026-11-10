@@ -36,6 +36,9 @@ Get-ChildItem "$Kaynak\test" -Filter *.dart | Where-Object {
 $sapmalar = @()
 if (Test-Path $ozetYolu) { $sapmalar = @((Get-Content $ozetYolu -Raw | ConvertFrom-Json).bilincli_sapmalar) }
 $sapmaDosyalari = @($sapmalar | ForEach-Object { $_.dosya })
+# Dosya özetini etkilemeyen bilinçli farklar (örn. lib/platform/db_baglanti.dart) da korunur.
+$farklar = @()
+if (Test-Path $ozetYolu) { $farklar = @((Get-Content $ozetYolu -Raw | ConvertFrom-Json).bilincli_farklar) }
 
 $dosyalar = [ordered]@{}
 foreach ($g in ($liste | Sort-Object)) {
@@ -58,5 +61,6 @@ if ($kirli.Count -gt 0) { Write-Warning "Kopyalanan dosyalar '$etiket' etiketiyl
     etiketle_ayni    = ($kirli.Count -eq 0)
     dosyalar         = $dosyalar
     bilincli_sapmalar = $sapmalar
+    bilincli_farklar  = $farklar
 } | ConvertTo-Json -Depth 5 | Set-Content $ozetYolu -Encoding utf8
 Write-Host "$($dosyalar.Count) dosya eşitlendi; kaynak $etiket ($($sha.Substring(0,7)))."

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_aciklama">Bugünün alışkanlıkları; dokununca yapıldı olarak işaretler.</string>
+    <string name="widget_baslik">Bugün</string>
+    <string name="widget_baslik_sayili">Bugün  %1$d/%2$d</string>
+    <string name="widget_bos">Bugün için alışkanlık yok. Açmak için dokun.</string>
+    <string name="widget_bayat">Yeni gün başladı. Güncellemek için uygulamayı aç.</string>
+    <string name="widget_satir_yapildi">%1$s, yapıldı</string>
+    <string name="widget_satir_bekliyor">%1$s, bekliyor. Yapıldı olarak işaretlemek için dokun.</string>
+    <string name="widget_fazla">+%1$d alışkanlık daha</string>
+</resources>
