@@ -5,7 +5,6 @@ import 'dart:io';
 import 'package:aktenak_habit_tracker/core/enums.dart';
 import 'package:aktenak_habit_tracker/data/database/database.dart';
 import 'package:aktenak_habit_tracker/data/sync/sync_export.dart';
-import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 
