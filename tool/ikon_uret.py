@@ -1,176 +1,119 @@
-"""Habit Tracker baslatici ikonunu uretir (masaustu app_icon.ico tasarimi).
+"""Habit Tracker baslatici ikonunu yeni logodan uretir.
 
 Calistirma (proje kokunden):  python tool/ikon_uret.py
+Kaynak: tool/ikon-kaynak/habit-tracker-logo.png (siyah zeminli logo; ustte halka+onay kutusu,
+altta yazi). Yalniz halka+kutu isareti kullanilir (yazi atilir). Isaret, siyah zeminde "isik"
+gibi davranir: alfa = zeminin ustundeki en parlak kanal, renk = alfaya bolunmus piksel.
+Boylece glow korunur ve koyu zemin uzerine konunca kaynakla ayni gorunur.
 Uretilen dosyalar (android/app/src/main/res altinda):
-  - mipmap-{m,h,xh,xxh,xxxh}dpi/ic_launcher.png  (eski cihazlar, yuvarlatilmis kare)
-  - mipmap-anydpi-v26/ic_launcher.xml            (adaptive + monochrome)
-  - drawable/ic_launcher_foreground.xml, ic_launcher_monochrome.xml (vektor)
-  - values/ic_launcher_background.xml            (koyu duz arka plan rengi)
-Gerekli: Pillow. Tasarim 256'lik izgarada; renkler ve olculer kaynak ikondan
-(256 px) orneklenmistir, cizim ise PIL ile 8x super-ornekleme (PNG) ve vektor (XML).
+  - drawable-{m,h,xh,xxh,xxxh}dpi/ic_launcher_foreground.png   (108..432 px, isaret merkez %66)
+  - drawable-{m,h,xh,xxh,xxxh}dpi/ic_launcher_monochrome.png   (beyaz alfa, temali ikon)
+  - mipmap-{m,h,xh,xxh,xxxh}dpi/ic_launcher.png                (eski cihazlar, yuvarlatilmis kare)
+  - mipmap-anydpi-v26/ic_launcher.xml, values/ic_launcher_background.xml
+Gerekli: Pillow.
 """
-import math
 import os
-from PIL import Image, ImageChops, ImageDraw
+from PIL import Image, ImageDraw
 
-# --- Tasarim (256'lik izgara) ---
-ARKA = (10, 11, 12)        # #0a0b0c zemin
-IZ = (30, 34, 36)          # #1e2224 halkanin bos (iz) kismi
-YESIL = (52, 168, 24)      # #34a818 seri halkasi
-TIK = (245, 245, 245)      # #f5f5f5 tik
-M = 128.0                  # merkez
-R = 71.75                  # halka orta yaricapi
-W = 17.5                   # halka kalinligi
-KOSE = 56.0                # zemin kose yaricapi
-DOLU_BAS, DOLU_BIT = 90.0, 160.0  # bos kisim (matematik derecesi, saat yonunun tersi); yesil geri kalan
-TIK_NOKTA = [(95.0, 130.25), (119.75, 154.75), (165.75, 102.5)]
-TIK_W = 17.25
+AD = os.path.dirname(os.path.abspath(__file__))
+KAYNAK = os.path.join(AD, "ikon-kaynak", "habit-tracker-logo.png")
+KOK = os.path.join(AD, "..", "android", "app", "src", "main", "res")
 
-KOK = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "android", "app", "src", "main", "res")
-SS = 8
-
-
-def _hex(c):
-    return "#%02x%02x%02x" % c
+ARKA = (2, 3, 6)            # #020306 duz arka plan (kaynagin zemini)
+ZEMIN = (2, 4, 7)           # alfa turetirken cikarilan zemin
+MERKEZ = (620, 467)         # halkanin merkezi (kaynak pikseli)
+YARI = 300                  # kirpma yaricapi; yazinin ustu (~310) disarida kalir
+TAM_R, SIFIR_R = 296, 304   # bu yaricapin otesinde isaret yumusakca sifirlanir
+HALKA_DIS = 547.0           # kaynakta halkanin dis capi (px)
+FG_ORAN = 0.60              # on plan: halka capi / tuval; glow dahil ~%66 guvenli alan
+LEG_ORAN = 0.70             # eski ikon: halka capi / tuval
+KOSE = 56.0 / 256.0         # eski ikon kose yaricapi / boyut
+YOGUNLUK = (("mdpi", 1), ("hdpi", 1.5), ("xhdpi", 2), ("xxhdpi", 3), ("xxxhdpi", 4))
 
 
-def _maske_halka(n, k, r_dis, r_ic):
-    """k: izgara->piksel katsayisi. Halka (annulus) maskesi."""
-    m = Image.new("L", (n, n), 0)
-    d = ImageDraw.Draw(m)
-    c = M * k
-    d.ellipse([c - r_dis * k, c - r_dis * k, c + r_dis * k, c + r_dis * k], fill=255)
-    d.ellipse([c - r_ic * k, c - r_ic * k, c + r_ic * k, c + r_ic * k], fill=0)
-    return m
+def isaret():
+    """Kaynaktan halka+kutu isaretini RGBA (600x600) olarak cikarir."""
+    kaynak = Image.open(KAYNAK).convert("RGB")
+    cx, cy = MERKEZ
+    kes = kaynak.crop((cx - YARI, cy - YARI, cx + YARI, cy + YARI))
+    n = 2 * YARI
+    px = kes.load()
+    out = Image.new("RGBA", (n, n))
+    op = out.load()
+    for y in range(n):
+        for x in range(n):
+            r, g, b = px[x, y]
+            r, g, b = max(0, r - ZEMIN[0]), max(0, g - ZEMIN[1]), max(0, b - ZEMIN[2])
+            a = max(r, g, b)
+            d = ((x - YARI + .5) ** 2 + (y - YARI + .5) ** 2) ** .5
+            a *= min(1.0, max(0.0, (SIFIR_R - d) / (SIFIR_R - TAM_R)))
+            if a < 3:  # zemin gurultusu
+                continue
+            m = max(r, g, b)
+            op[x, y] = (min(255, round(r * 255 / m)), min(255, round(g * 255 / m)),
+                        min(255, round(b * 255 / m)), round(a))
+    return out
 
 
-def _maske_yesil(n, k):
-    ring = _maske_halka(n, k, R + W / 2, R - W / 2)
-    pie = Image.new("L", (n, n), 0)
-    c = M * k
-    box = [c - 2 * R * k, c - 2 * R * k, c + 2 * R * k, c + 2 * R * k]
-    # PIL acisi saat yonunde, 3'ten baslar: yesil = 12'den saat yonunde bos kismin basina
-    ImageDraw.Draw(pie).pieslice(box, -DOLU_BAS, -DOLU_BIT + 360, fill=255)
-    return ImageChops.multiply(ring, pie)
+def yerlestir(isr, tuval, oran, taban=None):
+    """Isareti (halka capi tuval*oran olacak sekilde) tuvalin ortasina koyar."""
+    k = tuval * oran / HALKA_DIS
+    bt = max(1, round(isr.width * k))
+    kucuk = isr.resize((bt, bt), Image.LANCZOS)
+    taban = taban or Image.new("RGBA", (tuval, tuval), (0, 0, 0, 0))
+    taban.alpha_composite(kucuk, ((tuval - bt) // 2, (tuval - bt) // 2))
+    return taban
 
 
-def _maske_tik(n, k):
-    m = Image.new("L", (n, n), 0)
-    d = ImageDraw.Draw(m)
-    p = [(x * k, y * k) for x, y in TIK_NOKTA]
-    d.line(p, fill=255, width=round(TIK_W * k))
-    for x, y in p:  # yuvarlak uc ve birlesim
-        r = TIK_W * k / 2
-        d.ellipse([x - r, y - r, x + r, y + r], fill=255)
-    return m
-
-
-def _boya(maske, renk, taban):
-    taban.paste(Image.new("RGB", taban.size, renk), (0, 0), maske)
-
-
-def ciz_legacy(boyut):
-    """Yuvarlatilmis kare koyu zeminli tam ikon (RGBA)."""
-    n = boyut * SS
-    k = n / 256.0
+def legacy(isr, boyut):
+    n = boyut * 4  # super-ornekleme
     zemin = Image.new("RGBA", (n, n), (0, 0, 0, 0))
     msk = Image.new("L", (n, n), 0)
-    ImageDraw.Draw(msk).rounded_rectangle([0, 0, n - 1, n - 1], radius=KOSE * k, fill=255)
+    ImageDraw.Draw(msk).rounded_rectangle([0, 0, n - 1, n - 1], radius=KOSE * n, fill=255)
     zemin.paste(Image.new("RGBA", (n, n), ARKA + (255,)), (0, 0), msk)
-    rgb = zemin.convert("RGB")
-    _boya(_maske_halka(n, k, R + W / 2, R - W / 2), IZ, rgb)
-    _boya(_maske_yesil(n, k), YESIL, rgb)
-    _boya(_maske_tik(n, k), TIK, rgb)
-    out = rgb.convert("RGBA")
-    out.putalpha(msk)
-    return out.resize((boyut, boyut), Image.LANCZOS)
+    yerlestir(isr, n, LEG_ORAN, zemin)
+    zemin.putalpha(msk)
+    return zemin.resize((boyut, boyut), Image.LANCZOS)
 
 
-# --- Adaptive icon (vektor): 108dp tuval, halka dis capi HALKA_DP ---
-HALKA_DP = 60.0  # tuvalin %55,6'si, guvenli alan (merkez %66) icinde
-S = HALKA_DP / (2 * (R + W / 2))  # izgara -> dp
-TUVAL = 108.0
+def mono(fg):
+    """Temali ikon: beyaz, alfa yalniz isaretten; zayif glow kesilir, iz halka soluk kalir."""
+    a = fg.getchannel("A").point(lambda v: min(255, max(0, round((v - 30) * 255 / 225))))
+    out = Image.new("RGBA", fg.size, (255, 255, 255, 0))
+    out.putalpha(a)
+    return out
 
 
-def _p(x, y):
-    return (TUVAL / 2 + (x - M) * S, TUVAL / 2 + (y - M) * S)
-
-
-def _f(v):
-    return ("%.2f" % v).rstrip("0").rstrip(".")
-
-
-def _yol_yay():
-    r = R * S
-    c = TUVAL / 2
-    # yesil: tepeden (90) saat yonunde 160.75'e; baslangic (c, c-r), bitis aci DOLU_BIT
-    bx = c + r * math.cos(math.radians(DOLU_BIT))
-    by = c - r * math.sin(math.radians(DOLU_BIT))
-    return "M%s,%s A%s,%s 0 1,1 %s,%s" % (_f(c), _f(c - r), _f(r), _f(r), _f(bx), _f(by))
-
-
-def _yol_iz():
-    r = R * S
-    c = TUVAL / 2
-    return "M%s,%s A%s,%s 0 1,1 %s,%s A%s,%s 0 1,1 %s,%s" % (
-        _f(c - r), _f(c), _f(r), _f(r), _f(c + r), _f(c), _f(r), _f(r), _f(c - r), _f(c))
-
-
-def _yol_tik():
-    (x1, y1), (x2, y2), (x3, y3) = [_p(*q) for q in TIK_NOKTA]
-    return "M%s,%s L%s,%s L%s,%s" % (_f(x1), _f(y1), _f(x2), _f(y2), _f(x3), _f(y3))
-
-
-def _vektor(yollar):
-    govde = ""
-    for yol, renk, kal, uc in yollar:
-        govde += (
-            '    <path\n        android:pathData="%s"\n        android:strokeColor="%s"\n'
-            '        android:strokeWidth="%s"\n        android:strokeLineCap="%s"\n'
-            '        android:strokeLineJoin="round" />\n' % (yol, renk, _f(kal), uc))
-    return (
-        '<?xml version="1.0" encoding="utf-8"?>\n'
-        '<vector xmlns:android="http://schemas.android.com/apk/res/android"\n'
-        '    android:width="108dp"\n    android:height="108dp"\n'
-        '    android:viewportWidth="108"\n    android:viewportHeight="108">\n'
-        + govde + '</vector>\n')
-
-
-def _yaz(yol, icerik):
+def yaz(yol, icerik):
     yol = os.path.normpath(os.path.join(KOK, yol))
     os.makedirs(os.path.dirname(yol), exist_ok=True)
     with open(yol, "w", encoding="utf-8", newline="\n") as f:
         f.write(icerik)
 
 
-def main():
-    for klasor, px in (("mdpi", 48), ("hdpi", 72), ("xhdpi", 96), ("xxhdpi", 144), ("xxxhdpi", 192)):
-        yol = os.path.normpath(os.path.join(KOK, "mipmap-" + klasor, "ic_launcher.png"))
-        os.makedirs(os.path.dirname(yol), exist_ok=True)
-        ciz_legacy(px).save(yol, optimize=True)
+def kaydet(img, yol):
+    yol = os.path.normpath(os.path.join(KOK, yol))
+    os.makedirs(os.path.dirname(yol), exist_ok=True)
+    img.save(yol, optimize=True)
 
-    kal, tw = W * S, TIK_W * S
-    _yaz("drawable/ic_launcher_foreground.xml", _vektor([
-        (_yol_iz(), _hex(IZ), kal, "butt"),
-        (_yol_yay(), _hex(YESIL), kal, "butt"),
-        (_yol_tik(), _hex(TIK), tw, "round"),
-    ]))
-    # Temali ikon: yalniz alfa kullanilir; iz soluk, yay ve tik tam opak
-    _yaz("drawable/ic_launcher_monochrome.xml", _vektor([
-        (_yol_iz(), "#4D000000", kal, "butt"),
-        (_yol_yay(), "#FF000000", kal, "butt"),
-        (_yol_tik(), "#FF000000", tw, "round"),
-    ]))
-    _yaz("values/ic_launcher_background.xml",
-         '<?xml version="1.0" encoding="utf-8"?>\n<resources>\n'
-         '    <color name="ic_launcher_background">%s</color>\n</resources>\n' % _hex(ARKA))
-    _yaz("mipmap-anydpi-v26/ic_launcher.xml",
-         '<?xml version="1.0" encoding="utf-8"?>\n'
-         '<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">\n'
-         '    <background android:drawable="@color/ic_launcher_background" />\n'
-         '    <foreground android:drawable="@drawable/ic_launcher_foreground" />\n'
-         '    <monochrome android:drawable="@drawable/ic_launcher_monochrome" />\n'
-         '</adaptive-icon>\n')
+
+def main():
+    isr = isaret()
+    for ad, k in YOGUNLUK:
+        fg = yerlestir(isr, round(108 * k), FG_ORAN)
+        kaydet(fg, "drawable-%s/ic_launcher_foreground.png" % ad)
+        kaydet(mono(fg), "drawable-%s/ic_launcher_monochrome.png" % ad)
+        kaydet(legacy(isr, round(48 * k)), "mipmap-%s/ic_launcher.png" % ad)
+    yaz("values/ic_launcher_background.xml",
+        '<?xml version="1.0" encoding="utf-8"?>\n<resources>\n'
+        '    <color name="ic_launcher_background">#%02x%02x%02x</color>\n</resources>\n' % ARKA)
+    yaz("mipmap-anydpi-v26/ic_launcher.xml",
+        '<?xml version="1.0" encoding="utf-8"?>\n'
+        '<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">\n'
+        '    <background android:drawable="@color/ic_launcher_background" />\n'
+        '    <foreground android:drawable="@drawable/ic_launcher_foreground" />\n'
+        '    <monochrome android:drawable="@drawable/ic_launcher_monochrome" />\n'
+        '</adaptive-icon>\n')
 
 
 if __name__ == "__main__":

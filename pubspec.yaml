@@ -2,7 +2,7 @@ name: aktenak_habit_tracker
 description: "Aktenak Habit Tracker: hesapsız, yerel çalışan alışkanlık takip uygulaması (Android)."
 publish_to: 'none'
 
-version: 0.1.1+2
+version: 0.1.2+3
 
 environment:
   sdk: ^3.13.4
