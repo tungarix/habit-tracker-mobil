@@ -21,7 +21,7 @@ Mobil uygulama iskeletinden başlayıp masaüstündeki tüm özellikleri (Bugün
 | 4 QR + Wi-Fi senkron | Yalnız spike | Yalnız TLS spike betiği; yapıldı sayılmaz |
 | Yayın (imzalı APK, CI release) | Yok | Hiç denenmedi |
 
-Bu turda koşulanlar: `flutter pub get` tamam; `flutter analyze` 1 uyarı (aşağıda); mobilde 37 test dosyasının tamamı geçti (4 dosya motor çökmesi sonrası yeniden denemede); `tool/e2e/calistir.ps1` 15 senaryo geçti; masaüstü v5 çalışma kopyasında 23 test dosyası geçti; `flutter build apk --release --target-platform android-arm64` başarılı (180 MB, NDK'sız, yerel).
+Bu turda koşulanlar: `flutter pub get` tamam; `flutter analyze` temiz (tek uyarı, kullanılmayan import, sonradan giderildi); mobilde 37 test dosyasının tamamı geçti (4 dosya motor çökmesi sonrası yeniden denemede); `tool/e2e/calistir.ps1` 15 senaryo geçti; masaüstü v5 çalışma kopyasında 23 test dosyası geçti; `flutter build apk --release --target-platform android-arm64` başarılı (180 MB, NDK'sız, yerel).
 
 ## c) Senin telefonunda denenecekler
 
@@ -68,7 +68,6 @@ Bu turda koşulanlar: `flutter pub get` tamam; `flutter analyze` 1 uyarı (aşa�
 - Faz 4 (QR + Wi-Fi) yok; yalnız spike.
 - Yerel release APK NDK'sız ve 180 MB; yayın APK'sı yalnız CI'dan çıkar.
 - Windows'ta `flutter test` rastgele çöker (0xC0000005); testler dosya dosya yeniden denemeyle koşuyor.
-- `flutter analyze` 1 uyarı veriyor: `tool/e2e/habitsync_uret_test.dart` içinde kullanılmayan `drift` içe aktarımı (kozmetik, düzeltilmedi).
 - Gerçek veri denemesi `canli-veri` (12 Ağustos görüntüsü, küçük veri) üzerinde yapıldı; seri eşitliği zayıf sinyal.
 - Aylık tablo sistem yazısı %130 üstünde büyümüyor (sabit geometri); erişilebilirlik kararı sende.
 - `home_widget` eklentisi KGP uyarısı veriyor (derlemeyi bozmuyor).
