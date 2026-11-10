@@ -23,9 +23,13 @@ function Ozet([string]$yol) {
 $liste = [System.Collections.Generic.List[string]]::new()
 Get-ChildItem "$Kaynak\lib\core" -Filter *.dart | Where-Object Name -ne 'window_placement.dart' |
     ForEach-Object { $liste.Add("lib/core/$($_.Name)") }
-foreach ($f in 'tables.dart', 'database.dart', 'database.g.dart') { $liste.Add("lib/data/database/$f") }
+foreach ($f in 'tables.dart', 'database.dart', 'database.g.dart', 'sync_schema.dart') { $liste.Add("lib/data/database/$f") }
 foreach ($f in 'data_location.dart', 'auto_backup.dart', 'providers.dart') { $liste.Add("lib/data/$f") }
 Get-ChildItem "$Kaynak\lib\data\repositories" -Filter *.dart | ForEach-Object { $liste.Add("lib/data/repositories/$($_.Name)") }
+# Dosya senkronu (şema v5, .habitsync): saf Dart.
+Get-ChildItem "$Kaynak\lib\data\sync" -Filter *.dart | ForEach-Object { $liste.Add("lib/data/sync/$($_.Name)") }
+# Senkron spec'i tek kaynaktır; sync_purity_test.dart sınırları bununla karşılaştırır.
+$liste.Add('docs/senkron.md')
 # providers.dart bunu içe aktarır (saf Dart, arayüz yok).
 Get-ChildItem "$Kaynak\lib\data\models" -Filter *.dart | ForEach-Object { $liste.Add("lib/data/models/$($_.Name)") }
 Get-ChildItem "$Kaynak\test" -Filter *.dart | Where-Object {
@@ -59,6 +63,8 @@ if ($kirli.Count -gt 0) { Write-Warning "Kopyalanan dosyalar '$etiket' etiketiyl
     kaynak_commit    = $sha
     etiket           = $etiket
     etiketle_ayni    = ($kirli.Count -eq 0)
+    yayimlandi       = ($kirli.Count -eq 0)
+    not              = $(if ($kirli.Count -eq 0) { '' } else { "Kaynak $etiket sonrası YAYIMLANMAMIŞ bir dal (yerel commit $($sha.Substring(0,7))); etiket yok. Masaüstü v1.4.0 etiketlenince esitle yeniden çalıştırılmalı." })
     dosyalar         = $dosyalar
     bilincli_sapmalar = $sapmalar
     bilincli_farklar  = $farklar

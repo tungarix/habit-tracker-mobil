@@ -16,6 +16,7 @@ Masaüstü sürümü: [tungarix/habit-tracker](https://github.com/tungarix/habit
 - **Akşam hatırlatıcısı:** önümüzdeki 7 gün için bildirim; bugünün alışkanlıkları tamamsa bugünkü gelmez.
 - **Ana ekran widget'ı:** bugünün alışkanlıkları, dokununca ✓ yazar.
 - **Otomatik yedek:** açılışta ve uygulama öne gelince günde bir; uygulamanın kendi klasöründe kalır (telefon dışına çıkmaz, uygulama kaldırılınca silinir).
+- **Bilgisayarla senkron (taslak, masaüstü v1.4.0 ile birlikte yayımlanacak):** Ayarlar'dan `.habitsync` dosyasını dışa / içe aktar; dosya yöneticisinden ya da Paylaş menüsünden gelen `.habitsync` onay ekranıyla açılır. Çakışmada son değişiklik kazanır, hiçbir kayıt ikilenmez. Kurallar masaüstü reposundaki `docs/senkron.md` dosyasındadır.
 - Erişilebilirlik: durum işaretleri TalkBack'te okunur, dokunma alanları en az 48 dp.
 - Hesap ve bulut yok. İnternet yalnız güncelleme denetimi için (uygulama içi güncelleme arayüzü henüz bağlanmadı).
 
@@ -42,6 +43,7 @@ Sertifika SHA-256 parmak izi: _ilk sürümde yazılacak_.
 ```
 flutter pub get
 flutter analyze
+pwsh tool/e2e/calistir.ps1     # masaüstü <-> mobil senkron uçtan uca (geçici veritabanları)
 pwsh tool/test_calistir.ps1    # testleri dosya dosya çalıştırır (Windows'ta flutter_tester çöker)
 ```
 

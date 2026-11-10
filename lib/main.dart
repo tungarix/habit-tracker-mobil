@@ -11,6 +11,7 @@ import 'features/today/focus_controller.dart';
 import 'platform/bildirimler.dart';
 import 'platform/db_baglanti.dart';
 import 'platform/hatirlatici_ayari.dart';
+import 'platform/kopru.dart';
 import 'platform/odak_denetleyici.dart';
 import 'platform/widget_servisi.dart';
 import 'platform/yan_etki_izleyici.dart';
@@ -45,8 +46,11 @@ Future<void> main() async {
   final container = ProviderContainer(
     overrides: [
       databaseProvider.overrideWithValue(db),
+      kopruProvider.overrideWithValue(AndroidKopru()),
       focusControllerProvider.overrideWithValue(odak),
-      reminderSettingsProvider.overrideWithValue(AndroidReminderSettings(db, bildirim)),
+      reminderSettingsProvider.overrideWithValue(
+        AndroidReminderSettings(db, bildirim),
+      ),
     ],
   );
   AutoBackupLifecycle(container).start();

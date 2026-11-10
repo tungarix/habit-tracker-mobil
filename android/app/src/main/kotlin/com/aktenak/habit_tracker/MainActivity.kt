@@ -3,6 +3,7 @@ package com.aktenak.habit_tracker
 import android.app.PendingIntent
 import android.content.Intent
 import android.content.pm.PackageInstaller
+import android.os.Bundle
 import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Build
@@ -10,6 +11,7 @@ import android.provider.Settings
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
+import java.io.ByteArrayOutputStream
 import java.io.File
 
 /**
@@ -20,9 +22,26 @@ import java.io.File
  *    with this package name and a higher versionCode is accepted; the final word is Android's
  *    signature check (an APK signed with another key cannot be installed over this one).
  *  - kurulumSonucu (Kotlin -> Dart): session result.
+ *  - bekleyenDosya / dosyaGeldi: a .habitsync opened with "Open with" / Share. Only content:// is read, at most
+ *    16 MB; the bytes go to Dart, which validates and asks the user before anything is merged.
  */
 class MainActivity : FlutterActivity() {
     private var kanal: MethodChannel? = null
+    private var bekleyen: Map<String, Any>? = null
+
+    // After Dart's first "bekleyenDosya" call its listener is ready; a push before that would be lost.
+    private var dartHazir = false
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        // A recreated process must not handle the same intent twice.
+        if (savedInstanceState == null) dosyayiOku(intent)
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        dosyayiOku(intent)
+    }
 
     // Remove only OUR listener: a second MainActivity instance may have replaced it.
     private var benimDinleyici: ((Int, String?) -> Unit)? = null
@@ -52,6 +71,12 @@ class MainActivity : FlutterActivity() {
                         sonuc.success(null)
                     }
                     "apkKur" -> apkKur(cagri.arguments as? String, sonuc)
+                    "bekleyenDosya" -> {
+                        dartHazir = true
+                        val b = bekleyen
+                        bekleyen = null
+                        sonuc.success(b)
+                    }
                     else -> sonuc.notImplemented()
                 }
             }
@@ -103,5 +128,43 @@ class MainActivity : FlutterActivity() {
             if (oturumNo >= 0 && !commitEdildi) try { packageManager.packageInstaller.abandonSession(oturumNo) } catch (_: Exception) {}
             sonuc.error("kurulum", e.message ?: e.javaClass.simpleName, null)
         }
+    }
+
+    private fun dosyayiOku(i: Intent?) {
+        if (i == null) return
+        val uri: Uri? = when (i.action) {
+            Intent.ACTION_VIEW -> i.data
+            Intent.ACTION_SEND ->
+                if (Build.VERSION.SDK_INT >= 33) i.getParcelableExtra(Intent.EXTRA_STREAM, Uri::class.java)
+                else @Suppress("DEPRECATION") i.getParcelableExtra(Intent.EXTRA_STREAM)
+            else -> null
+        }
+        if (uri == null) return
+        // Only content:// is accepted. The manifest filter alone is not enough: an explicit intent skips it and
+        // a file:// URI could make the app read its own private files.
+        if (uri.scheme != "content") {
+            setIntent(Intent())
+            return
+        }
+        val sonuc: Map<String, Any> = try {
+            val sinir = 16 * 1024 * 1024
+            val cikti = ByteArrayOutputStream()
+            contentResolver.openInputStream(uri).use { girdi ->
+                if (girdi == null) throw IllegalStateException("dosya açılamadı")
+                val tampon = ByteArray(64 * 1024)
+                while (true) {
+                    val n = girdi.read(tampon)
+                    if (n < 0) break
+                    cikti.write(tampon, 0, n)
+                    if (cikti.size() > sinir) throw IllegalStateException("dosya çok büyük (en çok 16 MB)")
+                }
+            }
+            mapOf("bayt" to cikti.toByteArray())
+        } catch (e: Exception) {
+            mapOf("hata" to (e.message ?: e.javaClass.simpleName))
+        }
+        // The same file must not be handled again (e.g. on coming back to the foreground).
+        setIntent(Intent())
+        if (dartHazir && kanal != null) kanal?.invokeMethod("dosyaGeldi", sonuc) else bekleyen = sonuc
     }
 }

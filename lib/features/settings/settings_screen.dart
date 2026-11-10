@@ -4,9 +4,13 @@ import 'package:intl/intl.dart';
 
 import '../../core/constants.dart';
 import '../../data/providers.dart';
+import '../../data/sync/sync_export.dart';
+import '../../data/sync/sync_format.dart';
 import '../../shared/tema_modu.dart';
 import 'backup_file_service.dart';
 import 'reminder_settings.dart';
+import 'senkron_akisi.dart';
+import 'senkron_dosya_servisi.dart';
 import '../../ui_metin.dart';
 
 enum _ImportMode { merge, replace }
@@ -80,6 +84,36 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     }
   }
 
+  Future<void> _syncExport() async {
+    setState(() => _busy = true);
+    try {
+      final text = await exportSync(
+        ref.read(databaseProvider),
+        deviceName: 'Telefon',
+      );
+      await ref.read(senkronDosyaServisiProvider).paylas(text, syncFileName());
+    } catch (e) {
+      _toast(Metin.disaAktarmaHata('$e'));
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  Future<void> _syncImport() async {
+    setState(() => _busy = true);
+    try {
+      final bytes = await ref.read(senkronDosyaServisiProvider).sec();
+      if (bytes == null || !mounted) return; // cancelled
+      await senkronDosyasiniIceAktar(context, ref, bytes);
+    } on SyncException catch (e) {
+      _toast(Metin.senkronGecersiz(e.message));
+    } catch (e) {
+      _toast(Metin.iceAktarmaHata('$e'));
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
   Future<_ImportMode?> _askMergeOrReplace() {
     return showDialog<_ImportMode>(
       context: context,
@@ -144,6 +178,25 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               const SizedBox(height: 16),
               const Center(child: CircularProgressIndicator()),
             ],
+            const SizedBox(height: 24),
+            Semantics(
+              header: true,
+              child: Text(Metin.senkronBaslik, style: text.titleSmall),
+            ),
+            const SizedBox(height: 8),
+            _ActionCard(
+              icon: Icons.computer,
+              title: Metin.senkronDisaAktar,
+              subtitle: Metin.senkronDisaAktarAciklama,
+              onTap: _busy ? null : _syncExport,
+            ),
+            const SizedBox(height: 8),
+            _ActionCard(
+              icon: Icons.sync,
+              title: Metin.senkronIceAktar,
+              subtitle: Metin.senkronIceAktarAciklama,
+              onTap: _busy ? null : _syncImport,
+            ),
             const SizedBox(height: 24),
             Semantics(
               header: true,
@@ -291,9 +344,7 @@ class _ReminderRow extends StatelessWidget {
           secondary: const Icon(Icons.notifications_outlined),
           title: const Text(Metin.aksamHatirlaticisi),
           subtitle: Text(
-            h == null
-                ? Metin.hatirlaticiKapali
-                : Metin.hatirlaticiAcik(_hh(h)),
+            h == null ? Metin.hatirlaticiKapali : Metin.hatirlaticiAcik(_hh(h)),
           ),
           value: h != null,
           onChanged: loaded

@@ -54,7 +54,7 @@ void main() {
   tearDown(() => dataDir.deleteSync(recursive: true));
 
   Future<void> ekraniAc(WidgetTester tester, AppDatabase db) async {
-    telefon(tester, height: 1600);
+    telefon(tester, height: 2600);
     await ac(
       tester,
       db,
@@ -244,7 +244,7 @@ void main() {
     tester,
   ) async {
     final db = await bellekDb();
-    telefon(tester, height: 1600);
+    telefon(tester, height: 2600);
     await ac(
       tester,
       db,

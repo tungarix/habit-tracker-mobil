@@ -4,7 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'features/habits/habits_screen.dart';
 import 'features/monthly/monthly_screen.dart';
+import 'features/settings/senkron_akisi.dart';
 import 'features/settings/settings_screen.dart';
+import 'platform/kopru.dart';
 import 'features/stats/stats_screen.dart';
 import 'features/tasks/tasks_screen.dart';
 import 'features/today/today_screen.dart';
@@ -33,18 +35,47 @@ class HabitApp extends ConsumerWidget {
 
 /// Bottom-navigation shell: Bugün / Görevler / Aylık / İstatistik. Habits and
 /// Settings open on top of it (pushed from the Bugün menu).
-class Kabuk extends StatefulWidget {
+class Kabuk extends ConsumerStatefulWidget {
   const Kabuk({super.key});
 
   @override
-  State<Kabuk> createState() => _KabukState();
+  ConsumerState<Kabuk> createState() => _KabukState();
 }
 
-class _KabukState extends State<Kabuk> {
+class _KabukState extends ConsumerState<Kabuk> {
   int _index = 0; // the app opens on Bugün
 
+  @override
+  void initState() {
+    super.initState();
+    final kopru = ref.read(kopruProvider);
+    if (kopru == null) return;
+    kopru.dosyaDinle(_gelen);
+    // Opened with a file (cold start): ask once the first frame is up.
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final g = await kopru.bekleyenDosya();
+      if (g != null) await _gelen(g);
+    });
+  }
+
+  /// A .habitsync opened from a file manager / share sheet: validate, confirm, merge.
+  Future<void> _gelen(GelenDosya g) async {
+    if (!mounted) return;
+    final bayt = g.bayt;
+    if (bayt == null) {
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(
+          SnackBar(content: Text(Metin.senkronGecersiz(g.hata ?? ''))),
+        );
+      return;
+    }
+    await senkronDosyasiniIceAktar(context, ref, bayt);
+  }
+
   void _push(Widget screen) =>
-      Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => screen));
+      Navigator.of(context)
+          .push(MaterialPageRoute<void>(builder: (_) => screen));
 
   @override
   Widget build(BuildContext context) {

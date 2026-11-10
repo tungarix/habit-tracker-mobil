@@ -348,6 +348,24 @@ abstract final class Metin {
   static const birlestir = 'Birleştir';
   static const tamamenDegistir = 'Tamamen değiştir';
 
+  // Bilgisayarla senkron (.habitsync)
+  static const senkronBaslik = 'Bilgisayarla senkron';
+  static const senkronDisaAktar = 'Bilgisayar için dışa aktar';
+  static const senkronDisaAktarAciklama =
+      'Tüm veriyi bir .habitsync dosyasına yaz, bilgisayarda aç.';
+  static const senkronIceAktar = 'Bilgisayardan içe aktar';
+  static const senkronIceAktarAciklama =
+      'Bilgisayarın .habitsync dosyasını bu verilerle birleştir. '
+      'Aynı kayıtta son değişiklik kazanır.';
+  static const senkronOnayBaslik = 'Senkron dosyası';
+  static String senkronOnayIcerik(int h, int e, int t, int s) =>
+      'Dosyada $h alışkanlık, $e işaret, $t görev, $s odak seansı var.\n\n'
+      'Bu telefondaki verilerle birleştirilir: aynı kayıtta son değişiklik '
+      'kazanır, hiçbir kayıt ikilenmez. Dosyada silinmiş olarak işaretli '
+      'kayıtlar burada da silinir.';
+  static const senkronIceAktarDugme = 'İçe aktar';
+  static String senkronGecersiz(String e) => '$e Hiçbir şey değişmedi.';
+
   static const otomatikYedekBaslik = 'Otomatik yedek';
   static const otomatikYedek = 'Günlük yedek';
   static const otomatikYedekAciklama =

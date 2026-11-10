@@ -29,6 +29,9 @@ jobs:
       - name: Testler
         run: flutter test
 
+      - name: Senkron e2e (masaüstü <-> mobil, geçici veritabanları)
+        run: flutter test tool/e2e/senkron_e2e_test.dart
+
       # Uyum bekçisi: kopyalanan masaüstü kodu kaynak etiketiyle birebir mi (kırar),
       # masaüstü master'ı ilerledi mi (yalnız uyarır).
       - name: Kaynak etiketi

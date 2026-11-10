@@ -42,6 +42,31 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+
+            <!-- Tapping a .habitsync file (file manager, messenger, Drive...) offers "Open with" this app.
+                 BROWSABLE is deliberately absent so a web page cannot start the app with an intent: link.
+                 Only content:// is accepted (MainActivity re-checks: an explicit intent skips the filter). -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:scheme="content" android:mimeType="application/x-habitsync"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:scheme="content" android:host="*" android:mimeType="*/*"/>
+                <!-- "." matches anything in pathPattern and the number of dots before the extension varies: three patterns. -->
+                <data android:pathPattern=".*\\.habitsync"/>
+                <data android:pathPattern=".*\\..*\\.habitsync"/>
+                <data android:pathPattern=".*\\..*\\..*\\.habitsync"/>
+            </intent-filter>
+            <!-- Share menu: the extension cannot be filtered there, so only our MIME type and the generic binary one. -->
+            <intent-filter>
+                <action android:name="android.intent.action.SEND"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:mimeType="application/x-habitsync"/>
+                <data android:mimeType="application/octet-stream"/>
+            </intent-filter>
         </activity>
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
