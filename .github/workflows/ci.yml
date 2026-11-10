@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Yalnız kodu okur.
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.47.5"
+          channel: stable
+
+      - name: Bağımlılıklar
+        run: flutter pub get
+
+      - name: Analiz
+        run: flutter analyze
+
+      - name: Testler
+        run: flutter test
+
+      # Uyum bekçisi: kopyalanan masaüstü kodu kaynak etiketiyle birebir mi (kırar),
+      # masaüstü master'ı ilerledi mi (yalnız uyarır).
+      - name: Kaynak etiketi
+        id: kaynak
+        run: echo "etiket=$(python3 -c "import json;print(json.load(open('tool/kaynak_ozet.json'))['etiket'])")" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/checkout@v5
+        with:
+          repository: tungarix/habit-tracker
+          ref: ${{ steps.kaynak.outputs.etiket }}
+          path: kaynak-etiket
+
+      - uses: actions/checkout@v5
+        with:
+          repository: tungarix/habit-tracker
+          ref: master
+          path: kaynak-master
+
+      - name: Uyum bekçisi
+        run: python3 scripts/uyum_bekcisi.py kaynak-etiket kaynak-master

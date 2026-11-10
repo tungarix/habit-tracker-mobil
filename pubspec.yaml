@@ -1,0 +1,48 @@
+name: aktenak_habit_tracker
+description: "Aktenak Habit Tracker: hesapsız, yerel çalışan alışkanlık takip uygulaması (Android)."
+publish_to: 'none'
+
+version: 0.0.1+1
+
+environment:
+  sdk: ^3.13.4
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  # Masaüstüyle (tungarix/habit-tracker) birebir aynı sürümler. Kopyalanan kod
+  # (lib/core, lib/data) bu sürümlere göre yazıldı; tool/esitle.ps1 ile eşitlenir.
+  drift: 2.34.0
+  sqlite3_flutter_libs: 0.6.0+eol
+  path_provider: ^2.1.6
+  path: ^1.9.1
+  flutter_riverpod: ^3.3.2
+  # Sapma: masaüstü ^11.0.2 kullanır ama share_plus 13.x ile win32 çakışır; Takvim'deki 13.x.
+  # Kopyalanan kodda file_picker kullanılmaz (yalnız mobil arayüzde).
+  file_picker: ^13.3.2
+  intl: ^0.20.2
+  # Yedeği sistem Paylaş menüsüyle dışa aktarma (Takvim'deki sürüm).
+  share_plus: ^13.3.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  # SHA-256 for test/uyum_test.dart (already in the lock via other packages).
+  crypto: ^3.0.0
+  drift_dev: 2.34.0
+  build_runner: ^2.15.0
+
+dependency_overrides:
+  # path_provider_android 2.3'ten itibaren JNI (NDK + CMake) kullanıyor; bu uygulamada
+  # gerekmiyor ve derleme ortamını ağırlaştırıyor. 2.2.x saf Kotlin/Pigeon'dur.
+  # Masaüstü kilidi 2.3.1 ama o Windows'ta kullanılmaz; sqlite3 ile ilgisi yok.
+  path_provider_android: '>=2.2.0 <2.3.0'
+  # Masaüstüyle aynı tam sürüm (pubspec.lock: sqlite3 3.3.3).
+  sqlite3: 3.3.3
+
+flutter:
+  uses-material-design: true
