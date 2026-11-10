@@ -58,6 +58,11 @@ Future<Uint8List> ornekDosya(String ad) async {
 }
 
 void main() {
+  test('onay metni silinecek kayıt sayısını söyler', () {
+    expect(Metin.senkronOnayIcerik(1, 2, 3, 4, 7), contains('7 kayıt var'));
+    expect(Metin.senkronOnayIcerik(1, 2, 3, 4, 0), contains('işaretli kayıt yok'));
+  });
+
   driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
   Future<void> ayarlariAc(
     WidgetTester tester,
@@ -106,6 +111,7 @@ void main() {
     await bekle(tester);
     expect(find.text(Metin.senkronOnayBaslik), findsOneWidget);
     expect(find.textContaining('1 alışkanlık'), findsOneWidget);
+    expect(find.textContaining('silinmiş olarak işaretli kayıt yok'), findsOneWidget);
 
     await tester.tap(find.text(Metin.iptal));
     await bekle(tester);

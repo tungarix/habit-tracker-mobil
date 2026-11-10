@@ -70,7 +70,7 @@ class MainActivity : FlutterActivity() {
                         )
                         sonuc.success(null)
                     }
-                    "apkKur" -> apkKur(cagri.arguments as? String, sonuc)
+                    "apkKur" -> apkKur(cagri.argument<String>("yol"), cagri.argument<String>("ozet"), sonuc)
                     "bekleyenDosya" -> {
                         dartHazir = true
                         val b = bekleyen
@@ -89,11 +89,11 @@ class MainActivity : FlutterActivity() {
         return if (cm.isActiveNetworkMetered) "mobil" else "wifi"
     }
 
-    private fun apkKur(yol: String?, sonuc: MethodChannel.Result) {
+    private fun apkKur(yol: String?, ozet: String?, sonuc: MethodChannel.Result) {
         var oturumNo = -1
         var commitEdildi = false
         try {
-            require(yol != null) { "yol yok" }
+            require(yol != null && ozet != null && ozet.length == 64) { "yol ya da özet yok" }
             val dosya = File(yol).canonicalFile
             val klasor = cacheDir.canonicalFile
             require(dosya.path.startsWith(klasor.path + File.separator) && dosya.isFile && dosya.name.endsWith(".apk")) { "APK uygulamanın geçici klasöründe değil" }
@@ -111,12 +111,16 @@ class MainActivity : FlutterActivity() {
             val id = kurucu.createSession(params)
             oturumNo = id
             kurucu.openSession(id).use { oturum ->
-                dosya.inputStream().use { girdi ->
+                // Hash exactly the bytes handed to the installer; a mismatch abandons the session pre-commit.
+                val md = java.security.MessageDigest.getInstance("SHA-256")
+                java.security.DigestInputStream(dosya.inputStream(), md).use { girdi ->
                     oturum.openWrite("habit-tracker.apk", 0, dosya.length()).use { cikti ->
                         girdi.copyTo(cikti)
                         oturum.fsync(cikti)
                     }
                 }
+                val gercek = md.digest().joinToString("") { "%02x".format(it) }
+                require(gercek == ozet.lowercase()) { "SHA-256 özeti tutmuyor" }
                 val niyet = Intent(this, KurulumAlici::class.java)
                 val bayrak = PendingIntent.FLAG_UPDATE_CURRENT or (if (Build.VERSION.SDK_INT >= 31) PendingIntent.FLAG_MUTABLE else 0)
                 oturum.commit(PendingIntent.getBroadcast(this, id, niyet, bayrak).intentSender)

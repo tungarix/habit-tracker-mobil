@@ -44,6 +44,7 @@ Future<void> senkronDosyasiniIceAktar(
             dosya.entries.length,
             dosya.tasks.length,
             dosya.sessions.length,
+            dosya.deleted.length,
           ),
         ),
       ),

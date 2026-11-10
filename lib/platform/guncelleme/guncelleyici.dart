@@ -1,6 +1,6 @@
 // Güncelleyici: denetim zamanı, ETag ve bulunan sürümün saklanması + indirme/doğrulama.
 // Durum Settings tablosunda (ayarlar.dart) (kullanıcı verisi değil: bozuksa "hiç denetlenmedi" sayılır).
-// Kurulum (PackageInstaller) burada DEĞİL: `Kopru.apkKur`; akışı `ui/guncelleme_akisi.dart` yönetir.
+// Kurulum (PackageInstaller) burada DEĞİL: `Kopru.apkKur`; akışı `akis.dart` yönetir.
 import 'dart:io';
 
 import 'sha256.dart';

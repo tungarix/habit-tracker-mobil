@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'features/habits/habits_screen.dart';
 import 'features/monthly/monthly_screen.dart';
+import 'features/settings/guncelleme_bolumu.dart';
 import 'features/settings/senkron_akisi.dart';
 import 'features/settings/settings_screen.dart';
 import 'platform/kopru.dart';
@@ -55,6 +56,12 @@ class _KabukState extends ConsumerState<Kabuk> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final g = await kopru.bekleyenDosya();
       if (g != null) await _gelen(g);
+      if (!mounted) return;
+      try {
+        await guncellemeIlkAcilis(context, ref);
+      } catch (_) {
+        // The update check is optional; never block the app.
+      }
     });
   }
 

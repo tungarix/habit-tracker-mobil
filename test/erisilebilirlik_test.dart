@@ -50,6 +50,61 @@ void main() {
     });
   }
 
+  // Aylık, İstatistik, Alışkanlıklar and Ayarlar, both themes. Aylık is exempt from the 48 dp
+  // rule only: PLAN Faz 1 asks for 44 px cells there (a deliberate conflict with the 48 dp
+  // rule, reported to Arda); labels and contrast still apply to it.
+  for (final koyu in [false, true]) {
+    testWidgets(
+      'erişilebilirlik: Aylık, İstatistik, Alışkanlıklar, Ayarlar (${koyu ? "koyu" : "açık"})',
+      (tester) async {
+        telefonBoyutu(tester, yukseklik: 900);
+        tester.platformDispatcher.platformBrightnessTestValue =
+            koyu ? Brightness.dark : Brightness.light;
+        addTearDown(tester.platformDispatcher.clearPlatformBrightnessTestValue);
+        final handle = tester.ensureSemantics();
+        final db = await bellekDb();
+        await aliskanlikEkle(db, 'Kitap');
+        await aliskanlikEkle(db, 'Su', kind: 'count', target: 8);
+        await uygulamaAc(tester, db);
+
+        Future<void> denetle({bool dokunma = true}) async {
+          if (dokunma) {
+            await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
+          }
+          await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
+          await expectLater(tester, meetsGuideline(textContrastGuideline));
+        }
+
+        Future<void> sekme(String ad) async {
+          await tester.tap(find.descendant(
+            of: find.byType(NavigationBar),
+            matching: find.text(ad),
+          ));
+          await bekle(tester);
+        }
+
+        await sekme(Metin.sekmeAylik);
+        await denetle(dokunma: false);
+        await sekme(Metin.sekmeIstatistik);
+        await denetle();
+        await sekme(Metin.sekmeBugun);
+
+        for (final ad in [Metin.menuAliskanliklar, Metin.menuAyarlar]) {
+          await tester.tap(find.byTooltip(Metin.menu));
+          await bekle(tester);
+          await tester.tap(find.text(ad));
+          await bekle(tester);
+          await denetle();
+          Navigator.of(tester.element(find.byType(Scaffold).last)).pop();
+          await bekle(tester);
+        }
+
+        handle.dispose();
+        await temizle(tester);
+      },
+    );
+  }
+
   testWidgets('Bugün ve Görevler ekranlarında 12 px altı yazı yok', (
     tester,
   ) async {

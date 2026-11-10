@@ -1,6 +1,6 @@
 # 05 - Emulatorde gercek calisma dogrulamasi
 
-Ortam: yeni AVD `Telefon35` (pixel_6, mevcut android-35 sistem imaji, indirme yok), debug APK (`HABIT_YEREL_NDKSIZ=1`; NDK klasoru bu makinede bos, strip atlandi). Ekran goruntuleri: `docs/gece-raporu/ekran/`.
+Ortam: yeni AVD `Telefon35` (pixel_6, mevcut android-35 sistem imaji, indirme yok), debug APK (`HABIT_YEREL_NDKSIZ=1`; NDK klasoru bu makinede bos, strip atlandi). Ekran goruntuleri gercek kullanici verisi icerdigi icin repodan ve gecmisten cikarildi (bkz. 06-duzeltmeler.md); sahte veriyle yenileri cekilecek.
 Not: `Tablet35` AVD'si bu makinede yoktu (SDK `C:\Android\Sdk`).
 
 ## Dogrulandi (emulatorde calistirildi)

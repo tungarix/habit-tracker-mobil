@@ -358,11 +358,11 @@ abstract final class Metin {
       'Bilgisayarın .habitsync dosyasını bu verilerle birleştir. '
       'Aynı kayıtta son değişiklik kazanır.';
   static const senkronOnayBaslik = 'Senkron dosyası';
-  static String senkronOnayIcerik(int h, int e, int t, int s) =>
+  static String senkronOnayIcerik(int h, int e, int t, int s, int silinen) =>
       'Dosyada $h alışkanlık, $e işaret, $t görev, $s odak seansı var.\n\n'
       'Bu telefondaki verilerle birleştirilir: aynı kayıtta son değişiklik '
-      'kazanır, hiçbir kayıt ikilenmez. Dosyada silinmiş olarak işaretli '
-      'kayıtlar burada da silinir.';
+      'kazanır, hiçbir kayıt ikilenmez.\n\n'
+      '${silinen == 0 ? 'Dosyada silinmiş olarak işaretli kayıt yok.' : 'Dosyada silinmiş olarak işaretli $silinen kayıt var; bunlar bu telefonda varsa silinir.'}';
   static const senkronIceAktarDugme = 'İçe aktar';
   static String senkronGecersiz(String e) => '$e Hiçbir şey değişmedi.';
 
@@ -390,4 +390,41 @@ abstract final class Metin {
   static String hatirlaticiAcik(String hh) =>
       'Bekleyen alışkanlık varsa saat $hh\'da bildirim gösterir.';
   static String hatirlaticiSesli(int h) => 'saat $h';
+
+  // --- Güncelleme -----------------------------------------------------------
+  static const guncellemeBaslik = 'Güncelleme';
+  static const guncellemeDenetle = 'Güncellemeleri denetle';
+  static const guncellemeDenetleAciklama =
+      'Günde en çok bir kez GitHub\'a sorar. Kapalıyken internet kullanılmaz.';
+  static const guncellemeYalnizWifi = 'Yalnız Wi-Fi\'da indir';
+  static const guncellemeSimdiDenetle = 'Şimdi denetle';
+  static const guncellemeDenetleniyor = 'Denetleniyor...';
+  static const guncellemeGuncel = 'Uygulama güncel.';
+  static const guncellemeHic = 'Henüz denetlenmedi.';
+  static String guncellemeHazir(String s) => 'Yeni sürüm hazır: $s';
+  static const guncellemeIndirKur = 'İndir ve kur';
+  static const guncellemeIndiriliyor = 'İndiriliyor ve doğrulanıyor...';
+  static const guncellemeKurulumAcildi =
+      'Doğrulandı. Android\'in kurulum penceresinde onayla.';
+  static const guncellemeIlkBaslik = 'Güncellemeler denetlensin mi?';
+  static const guncellemeIlkGovde =
+      'Uygulama günde en çok bir kez GitHub\'a bağlanıp yeni sürüm olup '
+      'olmadığına bakabilir. Kişisel veri gönderilmez. İndirme yalnız '
+      'Wi-Fi\'da yapılır. İstersen Ayarlar\'dan değiştirebilirsin.';
+  static const guncellemeIlkHayir = 'Hayır';
+  static const guncellemeIlkEvet = 'Evet, denetle';
+  static const guncellemeMobilBaslik = 'Mobil veriyle indirilsin mi?';
+  static const guncellemeMobilGovde =
+      'Şu an Wi-Fi\'da değilsin. Güncelleme dosyası yaklaşık 60 MB.';
+  static const guncellemeMobilEvet = 'Mobil veriyle indir';
+  static String guncellemeHata(String kod) => switch (kod) {
+    'ag_yok' => 'İnternet bağlantısı yok.',
+    'wifi_gerek' => 'İndirme Wi-Fi\'ı bekliyor.',
+    'izin_yok' =>
+      'Bu uygulamaya kurulum izni ver, sonra geri dönüp tekrar dene.',
+    'ozet_uyusmuyor' || 'ozet_bulunamadi' =>
+      'İndirilen dosya doğrulanamadı, kurulmadı.',
+    'ag_hatasi' || 'limit' => 'İndirme tamamlanamadı, sonra tekrar dene.',
+    _ => 'Güncelleme yapılamadı ($kod).',
+  };
 }

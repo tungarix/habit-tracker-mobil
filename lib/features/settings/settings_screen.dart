@@ -8,6 +8,7 @@ import '../../data/sync/sync_export.dart';
 import '../../data/sync/sync_format.dart';
 import '../../shared/tema_modu.dart';
 import 'backup_file_service.dart';
+import 'guncelleme_bolumu.dart';
 import 'reminder_settings.dart';
 import 'senkron_akisi.dart';
 import 'senkron_dosya_servisi.dart';
@@ -77,6 +78,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       _toast(
         Metin.iceAktarildi(r.habits, r.entries, r.moods, r.tasks, r.sessions),
       );
+    } on FormatException catch (e) {
+      _toast(Metin.iceAktarmaHata(e.message));
     } catch (e) {
       _toast(Metin.iceAktarmaHata('$e'));
     } finally {
@@ -204,6 +207,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ),
             const SizedBox(height: 8),
             const _AutoBackupCard(),
+            const GuncellemeBolumu(),
             const SizedBox(height: 24),
             Semantics(
               header: true,

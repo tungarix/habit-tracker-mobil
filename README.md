@@ -12,13 +12,13 @@ Masaüstü sürümü: [tungarix/habit-tracker](https://github.com/tungarix/habit
 - **Aylık:** alışkanlık x gün tablosu (44 px hücre, yatay kayar, adlar sabit sütunda) ve mood grafiği.
 - **İstatistik:** seriler, tamamlama oranları, 30 gün şeridi, mood ile tamamlama ilişkisi.
 - **Alışkanlıklar ve Ayarlar** (Bugün ekranının menüsünden): ekle, düzenle, arşivle, sırala, sil; tema (Sistem / Açık / Koyu); gün başlangıç saati; JSON yedeği dışa / içe aktarma (masaüstü yedekleri dahil).
-- **Odak sayacı:** ekran kapalıyken de zamanında biter, süreç ölse de kaldığı yerden sürer; bitiş bildirimi tam zamanlıdır.
+- **Odak sayacı:** bitiş bildirimi tam zamanlı kurulur ve süreç ölse de sayaç kaldığı yerden sürer. Ekran kapalıyken 25 dakikalık sayacın gerçekten zamanında çalması ve bildirimin gelmesi gerçek telefonda DENENMEDİ.
 - **Akşam hatırlatıcısı:** önümüzdeki 7 gün için bildirim; bugünün alışkanlıkları tamamsa bugünkü gelmez.
 - **Ana ekran widget'ı:** bugünün alışkanlıkları, dokununca ✓ yazar.
 - **Otomatik yedek:** açılışta ve uygulama öne gelince günde bir; uygulamanın kendi klasöründe kalır (telefon dışına çıkmaz, uygulama kaldırılınca silinir).
 - **Bilgisayarla senkron (taslak, masaüstü v1.4.0 ile birlikte yayımlanacak):** Ayarlar'dan `.habitsync` dosyasını dışa / içe aktar; dosya yöneticisinden ya da Paylaş menüsünden gelen `.habitsync` onay ekranıyla açılır. Çakışmada son değişiklik kazanır, hiçbir kayıt ikilenmez. Kurallar masaüstü reposundaki `docs/senkron.md` dosyasındadır.
-- Erişilebilirlik: durum işaretleri TalkBack'te okunur, dokunma alanları en az 48 dp.
-- Hesap ve bulut yok. İnternet yalnız güncelleme denetimi için (uygulama içi güncelleme arayüzü henüz bağlanmadı).
+- Erişilebilirlik: durum işaretlerinin `Semantics` etiketleri ve dokunma alanları (Aylık hücreleri hariç: 44 px, plana göre) otomatik testlerle denetlenir. TalkBack ile gerçek cihazda okuma DENENMEDİ.
+- Hesap ve bulut yok. İnternet yalnız güncelleme için: Ayarlar'da güncelleme bölümü, ilk açılışta tek seferlik onay, varsayılan yalnız Wi-Fi; indirilen APK kurulumdan önce SHA-256 ile yeniden denetlenir (Kotlin tarafı da özeti doğrular). İmzalı yayın APK'sında sahte GitHub ile uçtan uca deneme henüz YAPILMADI.
 
 ## Kurulum
 

@@ -29,9 +29,9 @@ abstract class Kopru {
   Future<void> kurulumIzniAc();
 
   /// Installs a verified APK. Kotlin accepts only an APK inside the app cache dir, with the
-  /// same package name and a higher versionCode; otherwise throws a `PlatformException`.
+  /// same package name and a higher versionCode, and only if its SHA-256 equals [ozet]; otherwise throws a `PlatformException`.
   /// Success = the system install dialog opened.
-  Future<void> apkKur(String yol);
+  Future<void> apkKur(String yol, String ozet);
 
   /// PackageInstaller result (status code + message); 0 = success.
   void kurulumSonucuDinle(void Function(int durum, String? mesaj) f);
@@ -77,7 +77,8 @@ class AndroidKopru implements Kopru {
   Future<void> kurulumIzniAc() => _kanal.invokeMethod<void>('kurulumIzniAc');
 
   @override
-  Future<void> apkKur(String yol) => _kanal.invokeMethod<void>('apkKur', yol);
+  Future<void> apkKur(String yol, String ozet) =>
+      _kanal.invokeMethod<void>('apkKur', {'yol': yol, 'ozet': ozet});
 
   @override
   void kurulumSonucuDinle(void Function(int durum, String? mesaj) f) {

@@ -47,7 +47,8 @@ android {
     // Değişkenler yoksa (yerel geliştirme) debug anahtarı kullanılır: o APK yalnız yerel
     // deneme içindir, yayımlanan APK'lar hep aynı sürüm anahtarıyla imzalanır ve birbirinin
     // üstüne kurulur.
-    val surumAnahtari = System.getenv("HABIT_KEYSTORE")
+    // CI sets it to an empty string when there is no release key (untagged runs): treat that as unset.
+    val surumAnahtari = System.getenv("HABIT_KEYSTORE")?.takeIf { it.isNotBlank() }
     signingConfigs {
         if (surumAnahtari != null) {
             create("surum") {
