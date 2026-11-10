@@ -1,12 +1,9 @@
 ﻿# Habit Tracker (Android) sürüm imza anahtarını BİR KEZ oluşturur ve GitHub secret'larına yükler.
 #
-# - Anahtar depo DIŞINA yazılır ve İKİ yere konur (PLAN): Belgeler\habit-tracker-mobil-imza ve
-#   D:\Yedek-Imza-Anahtarlari\. Anahtar kaybolursa sonraki sürümler eskisinin üstüne kurulamaz
-#   (ilk sürümden itibaren hep aynı anahtar kullanılmalı).
-# - Şifre rastgele üretilir; ekrana basılmaz, komut satırına girmez (keytool: ortam değişkeni,
-#   gh: stdin). Anahtar klasörlerinde DÜZ METİN şifre dosyası YOKTUR. Şifre yalnız (a) GitHub
-#   secret'ında (yazma-yalnız), (b) bu kullanıcıya bağlı DPAPI ile şifreli sifre.dpapi dosyasında
-#   (yalnız ana klasörde, yedeğe kopyalanmaz) ve (c) panoya bir kez konur: parola yöneticine kaydet.
+# - Anahtar depo DIŞINA, Takvim ile aynı düzende yazılır: Belgeler\habit-tracker-mobil-imza
+#   (habit-surum.jks, sifre.txt, BENIOKU.txt). Klasörü ayrıca flaş belleğe kopyala. Anahtar
+#   kaybolursa sonraki sürümler eskisinin üstüne kurulamaz (hep aynı anahtar kullanılmalı).
+# - Şifre rastgele üretilir, komut satırına girmez (keytool: ortam değişkeni, gh: stdin).
 # - Ekrana yalnız sertifikanın SHA-256 parmak izi basılır (gizli değil).
 #
 # Kullanım (depo kökünde, gh oturumu açıkken):
@@ -14,13 +11,12 @@
 
 param(
     [string]$Klasor = (Join-Path ([Environment]::GetFolderPath('MyDocuments')) 'habit-tracker-mobil-imza'),
-    [string]$YedekKlasor = 'D:\Yedek-Imza-Anahtarlari',
     [string]$Repo = 'tungarix/habit-tracker-mobil'
 )
 $ErrorActionPreference = 'Stop'
 
 $anahtar = Join-Path $Klasor 'habit-surum.jks'
-$sifreDosyasi = Join-Path $Klasor 'sifre.dpapi'
+$sifreDosyasi = Join-Path $Klasor 'sifre.txt'
 if ((Test-Path $anahtar) -and -not (Test-Path $sifreDosyasi)) {
     # Yarım kalmış önceki deneme: şifresi kaydedilmemiş anahtar kullanılamaz.
     # Silinmez, kenara alınır.
@@ -63,11 +59,10 @@ $ErrorActionPreference = 'Continue'
 if ($LASTEXITCODE -ne 0) { throw 'keytool anahtarı oluşturamadı.' }
 
 # DPAPI: yalnız bu Windows kullanıcısı çözebilir; düz metin değildir.
-ConvertTo-SecureString $sifre -AsPlainText -Force | ConvertFrom-SecureString |
-    Set-Content -Path $sifreDosyasi -Encoding ascii
+[IO.File]::WriteAllText($sifreDosyasi, $sifre)
 @"
 Habit Tracker (Android) sürüm imza anahtarı ($(Get-Date -Format yyyy-MM-dd))
-Alias: habit. Şifre bu klasörde DEĞİL: parola yöneticisinde (anahtar ve alias için aynı).
+Alias: habit. Şifre: sifre.txt (anahtar ve alias için aynı).
 GitHub secret'ları: HABIT_KEYSTORE_BASE64, HABIT_KEYSTORE_PASSWORD ($Repo).
 Bu klasörü yedekle. Kaybolursa sonraki APK'lar eskisinin üstüne kurulmaz.
 "@ | Set-Content -Path (Join-Path $Klasor 'BENIOKU.txt') -Encoding utf8
@@ -89,24 +84,9 @@ function Set-GhSecret([string]$Ad, [string]$Deger) {
 Set-GhSecret 'HABIT_KEYSTORE_BASE64' ([Convert]::ToBase64String([IO.File]::ReadAllBytes($anahtar)))
 Set-GhSecret 'HABIT_KEYSTORE_PASSWORD' $sifre
 
-# İkinci yedek konumu: yalnız anahtar + BENIOKU (şifre dosyası kopyalanmaz).
-if (Test-Path (Split-Path $YedekKlasor -Qualifier)) {
-    New-Item -ItemType Directory -Force $YedekKlasor | Out-Null
-    Copy-Item $anahtar, (Join-Path $Klasor 'BENIOKU.txt') $YedekKlasor
-    Write-Host "İkinci yedek: $YedekKlasor"
-} else {
-    Write-Warning "Yedek sürücüsü yok ($YedekKlasor). Anahtarı elle ikinci bir yere kopyala."
-}
-
-Write-Host "Tamam. Anahtar: $Klasor"
-Write-Host 'Sertifika parmak izi:'
+Write-Host "Tamam. Anahtar klasörü (Takvim ile aynı düzen): $Klasor"
+Write-Host 'Bu klasörü flaş belleğe de kopyala. Sertifika parmak izi:'
 & $keytool -list -v -keystore $anahtar -storepass:env HABIT_ANAHTAR_PAROLA -alias habit 2>$null |
     Select-String 'SHA256:'
-
-# Şifreyi parola yöneticisine kaydetmen için panoya koy, sonra panoyu temizle.
-Set-Clipboard -Value $sifre
-Read-Host 'Şifre panoda. Parola yöneticisine yapıştırıp kaydet, sonra Enter (pano temizlenir)' | Out-Null
-Set-Clipboard -Value ' '
 Remove-Item Env:HABIT_ANAHTAR_PAROLA
 $sifre = $null
-Write-Host "Anahtar iki yerde: $Klasor ve $YedekKlasor. Şifre yalnız parola yöneticisinde ve GitHub secret'ında."
