@@ -21,6 +21,19 @@ Masaüstü sürümü: [tungarix/habit-tracker](https://github.com/tungarix/habit
 - Erişilebilirlik: durum işaretlerinin `Semantics` etiketleri ve dokunma alanları (Aylık hücreleri hariç: 44 px, plana göre) otomatik testlerle denetlenir. TalkBack ile gerçek cihazda okuma DENENMEDİ.
 - Hesap ve bulut yok. İnternet yalnız güncelleme için: Ayarlar'da güncelleme bölümü, ilk açılışta tek seferlik onay, varsayılan yalnız Wi-Fi; indirilen APK kurulumdan önce SHA-256 ile yeniden denetlenir (Kotlin tarafı da özeti doğrular). İmzalı yayın APK'sında sahte GitHub ile uçtan uca deneme henüz YAPILMADI.
 
+## Gizlilik ve izinler
+
+Hesap, bulut ve izleme yok. Uygulamanın istediği izinler ve nedenleri:
+
+| İzin | Ne zaman, ne için |
+|---|---|
+| Kamera (`CAMERA`) | Yalnız Ayarlar > "Bilgisayarla eşitle" > **"QR'ı tara"**ya basınca sistem izin sorar. Kamera yalnız bilgisayardaki QR kodu okumak için açılır; görüntü kaydedilmez, saklanmaz, hiçbir yere gönderilmez; okuma bitince ya da ekrandan çıkınca kapanır. İzni vermezsen ya da cihazda kamera yoksa **"Bağlantıyı yapıştır"** ile aynı eşleştirme yapılır; uygulamanın geri kalanı kameradan bağımsızdır. Manifestte kamera "zorunlu değil" olarak işaretlidir (`uses-feature required=false`), yani kamerasız cihazlara da kurulur. |
+| İnternet / ağ durumu | Güncelleme denetimi (açıksa) ve aynı Wi-Fi'daki bilgisayarla eşitleme. Düz HTTP kapalıdır. |
+| Bildirim, tam zamanlı alarm, açılışta yeniden kurma | Akşam hatırlatıcısı ve odak sayacı bitişi. |
+| Bilinmeyen uygulama kurma | Yalnız uygulama içi güncellemede, indirilen APK kurulurken. |
+
+Kameranın neden izinli olduğu ve neden kalıcı olduğu: `PLAN.md`, "Kamera izni" kararı.
+
 ## Kurulum
 
 _Yer tutucu: ilk imzalı sürüm yayımlanınca indirme bağlantısı buraya gelecek._

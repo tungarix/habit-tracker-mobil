@@ -171,6 +171,8 @@ void main() {
     final db = await bellekDb();
     final k = SahneKaydi();
     await ac(tester, db, k, gecici());
+    // Karar: kamera (ve izin istemi) yalnız "QR'ı tara"ya basınca; ekran açılınca tarayıcı yok.
+    expect(find.byKey(const Key('sahte-tarayici')), findsNothing);
     await tester.tap(find.text(Metin.wifiQrTara));
     await bekle(tester);
     expect(find.byKey(const Key('sahte-tarayici')), findsOneWidget);

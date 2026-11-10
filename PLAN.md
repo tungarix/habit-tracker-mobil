@@ -10,6 +10,7 @@ Sürüm 2 (2026-11-10). Bu sürüm üç açıdan yapılan eleştiri turuyla düz
 | Senkron | Önce `.habitsync` dosyasıyla iki yönlü, sonra QR + Wi-Fi. Bulut ve hesap yok. |
 | İlk public sürüm kapsamı | Masaüstündeki her şey (alışkanlık, aylık tablo, istatistik, görevler, odak sayacı, mood, yedek). Ek olarak akşam hatırlatıcısı, ana ekran widget'ı ve uygulama içi güncelleme. |
 | Düzen | Alt menü: Bugün / Görevler / Aylık / İstatistik. Uygulama Bugün ekranıyla açılır ve orada bugünün alışkanlık listesi durur. |
+| Kamera izni (KALICI, 2026-11-10) | `CAMERA` izni vardır; ilk plandaki "kamera izni yok" maddesi bu kararla değişti. Gerekçe: QR'ı uygulamanın kendi tarayıcısı okur (App Link ve site tarafı `assetlinks.json` gerekmez). Kurallar: (1) manifestte `<uses-feature android:name="android.hardware.camera" android:required="false"/>`, kamerasız cihaz yine kurar ve "Bağlantıyı yapıştır" yolunu kullanır; (2) izin metni yalnız "QR'ı tara"ya basınca çıkar, açılışta ya da başka ekranda istenmez; (3) görüntü kaydedilmez, saklanmaz, gönderilmez; kamera okuma bitince ya da ekrandan çıkınca kapanır; (4) izin reddedilirse açıklama + ayarlar yolu + yapıştırma yolu gösterilir. Bu karar geri alınmadan başka amaçla kamera kullanılmaz. |
 
 Değişmeyecek kurallar:
 - **Kimlikler:** `applicationId` = `com.aktenak.habit_tracker`. Dart paket adı masaüstündekiyle aynı: `aktenak_habit_tracker`. Böylece kopyalanan testler derlenir. İkisi de bir daha değişmez. v1.2.0'da ürün adı değişince uygulama boş bir veritabanı açmıştı.
@@ -109,7 +110,7 @@ Bu fazda sıra, risk büyüklüğüne göre.
    - `INTERNET`. Release yapısında Flutter bunu kendiliğinden eklemez; unutulursa güncelleme sessizce çalışmaz.
    - `ACCESS_NETWORK_STATE`, `REQUEST_INSTALL_PACKAGES`.
    - `allowBackup=false`, `usesCleartextTraffic=false`.
-   - Kamera izni yok.
+   - Kamera izni Faz 2'de yoktu; Faz 4'te kalıcı kararla eklendi (yukarıdaki "Kamera izni" satırı): yalnız "QR'ı tara"ya basınca istenir, `uses-feature camera required=false`.
 6. **Güvenlik incelemesi:** Güncelleyici, widget'tan gelen yazmalar ve izinler `/security-review` ile incelenir ve `guvenlik/incelemeler/v0.1.0.md` dosyasına yazılır.
 7. **Çıkış (v0.1.0):**
    - Uygulama açıkken widget'tan işaretlenen alışkanlık uygulamada hemen görünür.
@@ -170,7 +171,7 @@ Kurallar masaüstü reposundaki `docs/senkron.md` dosyasında yazılır; tek kay
 - **Mobil istemci:** Takvim'in `wifi_istemci.dart` ve `sha256.dart` dosyaları alınır; bunlar zaten Dart.
 - **Masaüstü sunucusu yeni yazılır, en riskli parça bu:**
   - Dart kendi başına sertifika üretmez. Önce küçük bir deneme yapılır: `basic_utils` (`X509Utils.generateSelfSignedCertificate`) → `SecurityContext.useCertificateChainBytes` ve `usePrivateKeyBytes` → `HttpServer.bindSecure`.
-- **İzin:** `INTERNET` zaten Faz 2'de eklendi. targetSdk 37'ye çıkınca `ACCESS_LOCAL_NETWORK` gerekecek.
+- **İzin:** `INTERNET` zaten Faz 2'de eklendi. `CAMERA` kalıcı kararla eklendi (Kararlar tablosu); QR'ı uygulamanın kendi tarayıcısı okuduğu için App Link ve `assetlinks.json` gerekmez. targetSdk 37'ye çıkınca `ACCESS_LOCAL_NETWORK` gerekecek.
 
 ## Yayın düzeni
 1. Sürüm yükseltilir.

@@ -4,6 +4,8 @@ Bu dosya gece işinin bağımsız son doğrulamasından sonra yazıldı. Önceki
 
 ## a) Bu gece ne yapıldı
 
+> Karar turu (10 Kasım, sonra): Kararlar kapandı ve uygulandı. `mobil-senkron-v5` yerel `master`'a fast-forward birleşti (`masaustu-guncelleme` zaten içindeydi); masaüstü v1.4.0 HAZIRLIĞI commitlendi (pubspec 1.4.0+9, CHANGELOG, README, belgeler; etiket YOK); güncelleme paketi Ed25519 imzasıyla doğrulanıyor; kamera izni kalıcı karar. Mobil `tool/kaynak_ozet.json` v1.4.0 hazırlık commit'ine çekildi. Ayrıntı: `docs/faz4/rapor-karar-uygulama.md`. Hâlâ hiçbir şey yayımlanmadı: push, uzak depo, etiket, release yok.
+
 > Güncelleme (Faz 4 turu): QR + Wi-Fi eşleştirme (mobil istemci + masaüstü sunucu) ve masaüstü uygulama içi güncelleyici yazıldı, birleştirildi ve bağımsız incelemeden geçirildi. Aşağıdaki Faz 4 satırları, deneme listesi, yayın sırası ve sınırlar buna göre güncellendi. Ayrıntı: `docs/faz4/` (özellikle `inceleme.md`). Hâlâ hiçbir şey yayımlanmadı, push/etiket/release/imza anahtarı yok; gerçek telefonda ve gerçek Wi-Fi'da denenmedi.
 
 Mobil uygulama iskeletinden başlayıp masaüstündeki tüm özellikleri (Bugün, Görevler, Aylık, İstatistik, odak sayacı, mood, yedek) Flutter ile taşıdı; Android'e özgü widget, bildirim, odak alarmı ve uygulama içi güncelleme eklendi; masaüstü tarafında şema v5 (uid, updatedAt, silinenler) ve `.habitsync` dosya senkronu yazıldı (yerel, yayımlanmamış dal). İki tur düzeltme, bir güvenlik taslağı, veri bütünlüğü denemesi ve iki emülatör turu yapıldı. Hiçbir şey yayımlanmadı, push edilmedi, imza anahtarı üretilmedi. Sürüm 0.0.1+1; mobil repoda remote ve etiket yok. Gerçek telefonda hiçbir şey denenmedi.
@@ -19,10 +21,10 @@ Mobil uygulama iskeletinden başlayıp masaüstündeki tüm özellikleri (Bugün
 | 2 Odak sayacı | Var | Emülatörde tam zamanlı alarm kaydı; ekran kapalıyken çalma denenmedi |
 | 2 Uygulama içi güncelleme | Var | Emülatörde arayüz ve ilk onay; indirme, SHA doğrulaması, kurulum, kötü SHA reddi denenmedi (yalnız birim testi) |
 | 2 Güvenlik incelemesi | Taslak | `Sonuç:` boş, düşük bulgular açık; Arda dolduracak |
-| 3 Masaüstü şema v5 + `.habitsync` | Var, masaüstünde yerel dal `mobil-senkron-v5` | Birim testi + e2e (mobil/masaüstü senkron kodu, geçici DB) + gerçek verinin kopyasında migration; `.habitsync` içe aktarma emülatörde (VIEW intent) |
+| 3 Masaüstü şema v5 + `.habitsync` | Var, masaüstü yerel `master` (yayımlanmadı) | Birim testi + e2e (mobil/masaüstü senkron kodu, geçici DB) + gerçek verinin kopyasında migration; `.habitsync` içe aktarma emülatörde (VIEW intent) |
 | 4 Wi-Fi eşleştirme, mobil istemci | Var, mobil `main` | Birim/widget testi; masaüstü sunucusuyla gerçek TLS e2e (127.0.0.1, 6 senaryo); emülatörde 10.0.2.2 üzerinden tam akış (QR yerine bağlantı yapıştırılarak) |
-| 4 Wi-Fi eşleştirme, masaüstü sunucu + "Telefonla eşleştir" penceresi | Var, masaüstü yerel dal `mobil-senkron-v5` | Birim testi (gerçek HttpServer, loopback) + e2e; inceleme bulguları düzeltildi |
-| 4 Masaüstü uygulama içi güncelleyici | Var, aynı dalda (`masaustu-guncelleme` birleştirildi) | Birim testi (sahte GitHub, sahte kurucu); gerçek kurucu, gerçek GitHub, gerçek kurulum denenmedi; imza yok (yalnız SHA-256) |
+| 4 Wi-Fi eşleştirme, masaüstü sunucu + "Telefonla eşleştir" penceresi | Var, masaüstü yerel `master` (yayımlanmadı) | Birim testi (gerçek HttpServer, loopback) + e2e; inceleme bulguları düzeltildi |
+| 4 Masaüstü uygulama içi güncelleyici | Var, aynı `master`'da (`masaustu-guncelleme` birleşik) | Birim testi (sahte GitHub, sahte kurucu); gerçek kurucu, gerçek GitHub, gerçek kurulum denenmedi; `SHA256SUMS.txt` Ed25519 imzası doğrulanır (birim testi; gerçek anahtarla imzalama betiği denendi, CI'da hiç koşmadı) |
 | Yayın (imzalı APK, CI release) | Yok | Hiç denenmedi |
 
 Bu turda koşulanlar (ilk gece turu): `flutter pub get` tamam; `flutter analyze` temiz (tek uyarı, kullanılmayan import, sonradan giderildi); mobilde 37 test dosyasının tamamı geçti (4 dosya motor çökmesi sonrası yeniden denemede); `tool/e2e/calistir.ps1` 15 senaryo geçti; masaüstü v5 çalışma kopyasında 23 test dosyası geçti; `flutter build apk --release --target-platform android-arm64` başarılı (180 MB, NDK'sız, yerel).
@@ -46,28 +48,31 @@ Faz 4 inceleme turu (bu güncelleme): iki depoda `flutter analyze` temiz; mobild
 11. Wi-Fi eşleştirme (ön koşul: masaüstü v1.4.0 ya da `mobil-senkron-v5` derlemesi, aynı Wi-Fi): bilgisayarda Ayarlar > "Telefonla eşleştir (Wi-Fi)" aç, QR çıksın. Telefonda Ayarlar > "Bilgisayarla eşitle" > "QR'ı tara": kamera izni iste, ver, QR'ı okut (gerçek kamera ile okuma hiç denenmedi). Sırayla: telefonda "bu bilgisayar mı" onayı, bilgisayarda "bu telefon mu" onayı, telefonda özet, "Birleştir ve gönder", bilgisayarda veri onayı, iki yanda "tamamlandı" ve sayılar. Ayrıca dene: Windows Güvenlik Duvarı sorusu çıkıyor mu ve izin verince bağlanıyor mu; kamera izni reddi sonrası "Bağlantıyı yapıştır"; Wi-Fi'ı "ücretli" işaretleyip aynı akış (Kotlin `wifiBagli` hiç çalıştırılmadı); mobil veriyle denenince "Önce Wi-Fi'a bağlan" mesajı; QR'ı 3 dakika beklet (süre dolsun); bilgisayardaki İptal ve "reddet" yolları; birleştirme sırasında Wi-Fi'ı kapat (telefon "sonucu belli değil" göstermeli, bilgisayardaki pencereye bakıp doğrula). Sonra telefonda ve bilgisayarda birer değişiklik yapıp tekrar eşleştir, silme dahil iki yönü kontrol et; bilgisayarda yalnız sıralama değiştirip eşleştirdiğinde telefondaki yeniden adlandırma kaybolmamalı.
 12. Masaüstü uygulama içi güncelleme (bilgisayarında): v1.4.0'ı elle kur; sonraki bir sürüm yayımlanınca Ayarlar > Güncelleme > "Şimdi denetle", "İndir ve doğrula", "Kapat ve güncelle". Veri korunuyor mu, yeni sürüm açılıyor mu, antivirüs/SmartScreen engellerse kartta Türkçe hata çıkıp uygulama açık kalıyor mu. Gerçek kurucu hiç koşulmadı; ilk deneme yedeği alınmış temiz bir kurulumda yapılmalı. Program Files altındaki kurulumda "klasöre yazılamıyor" mesajı beklenir.
 
-## d) Karar bekleyenler
+## d) Kararlar
 
-- Uygulama adı: şu an "Habit Tracker" (manifest etiketi). Kimlikler (`com.aktenak.habit_tracker`) sabit kalacak.
-- Dokunma alanı: Aylık hücre 48 dp yapıldı (karar kapandı), erişilebilirlik testinde muafiyet yok.
-- Plan dışı izinler: `FOREGROUND_SERVICE`, `WAKE_LOCK`, `VIBRATE` birleşik manifestte var (paket bağımlılıklarından geliyor). Plan "ön plan servisi yok" diyor; kaldırılsın mı, kalsın mı?
-- Kaynak etiketi ve masaüstü v1.4.0 zamanı: `kaynak_ozet.json` etiketi v1.3.3, ama v5 kodu yayımlanmamış dalda. v1.4.0 çıkana dek mobil CI etiket denetiminde kırmızı olur.
-- Mobil repo adı ve açılışı: `tungarix/habit-tracker-mobil`, public, MIT (plan kararı); açılış zamanı sende.
-- Güncelleme paketi imzası: masaüstü güncelleyici zip'i yalnız aynı release'in `SHA256SUMS.txt`'iyle doğruluyor; GitHub hesabı ya da release ele geçirilirse saldırgan ikisini de değiştirir. Seçenekler: Ed25519 imza (gömülü genel anahtar), attestation doğrulaması ya da bilinen sınır olarak kalması. v1.4.0'dan önce karar gerek (`docs/faz4/inceleme.md`, bulgu 3).
-- Boyut: yerel APK 180 MB (NDK'sız, sembol temizlenmemiş). Uygulama içi güncelleyicinin varsayılan indirme sınırı 150 MB; CI'daki APK bunun altında kalmalı, ilk CI çıktısında kontrol et.
+Kapandı (Arda kararı, uygulandı):
+- **Dal:** `mobil-senkron-v5` yerel `master`'a birleştirildi (fast-forward, tarih düz). Dal ve worktree'ler (`habit-tracker-v5-calisma`, `habit-tracker-guncelleme-calisma`) SİLİNMEDİ; `habit-tracker` ana klasörü `master`'da.
+- **Paket imzası:** Ed25519 (gömülü açık anahtar). İmzasız ya da bozuk imzalı sürüm kurulmaz. Özel anahtar repo dışında; `docs/guncelleme-imzasi.md` (masaüstü repo).
+- **Kamera:** `CAMERA` izni kalıcı karar (`PLAN.md`, Kararlar tablosu): yalnız "QR'ı tara"ya basınca istenir, `uses-feature camera required=false`, görüntü kaydedilmez/gönderilmez, izin reddinde "Bağlantıyı yapıştır" yolu. README'de "Gizlilik ve izinler" bölümü.
+- **Masaüstü sürümü:** 1.4.0. Hazırlık commit'i `master`'da; etiket ve yayın Arda'nın.
+- **Kaynak etiketi:** `kaynak_ozet.json` şimdi `v1.4.0 (etiketlenecek)` + hazırlık commit SHA'sı. Etiket atılana dek mobil CI'nın "Kaynak etiketi" checkout adımı kırmızı olur (`v1.4.0` yok); Arda etiketi AYNI commit'e atınca yeşile döner. Yerelde simüle edildi: bekçi o commit'e karşı temiz geçti.
 
-## e) Yayın öncesi sıra (yapılmadı, senin onayınla)
+Hâlâ açık (karar verilmedi, ben kapatmadım):
+- Uygulama adı: şu an "Habit Tracker". Kimlikler (`com.aktenak.habit_tracker`) sabit.
+- Plan dışı izinler: `FOREGROUND_SERVICE`, `WAKE_LOCK`, `VIBRATE` birleşik manifestte var (bağımlılıklardan). Kaldırılsın mı?
+- Mobil repo adı ve açılışı: `tungarix/habit-tracker-mobil`, public, MIT; açılış zamanı sende.
+- Boyut: yerel APK 180 MB; güncelleyicinin varsayılan indirme sınırı 150 MB. İlk CI çıktısında kontrol et.
+- Güvenlik incelemesinin `Sonuç:` satırı (`guvenlik/incelemeler/v0.1.0.md`).
 
-1. Masaüstü v1.4.0 çıkışı. Artık yalnız v5 şeması değil Wi-Fi eşleştirme sunucusu ve uygulama içi güncelleyiciyi de içerir (`mobil-senkron-v5` dalı, `masaustu-guncelleme` birleşik). Çıkmadan önce karar: güncelleyici paketi imzası (aşağıda, d) ve güncelleyiciyi taşıyan ilk sürümün kullanıcıya elle kurulacağı (kendi kendine gelmez). Dalın akıbeti ve `masaustu-guncelleme` worktree'sinin kaldırılması da sende.
-2. `esitle.ps1` yeniden çalıştır, `kaynak_ozet.json` etiketini güncelle
-3. İmza anahtarı üretimi ve iki yedek (`scripts/imza_anahtari_olustur.ps1`)
-4. Mobil repo açılışı
-5. CI ilk koşu
-6. Güvenlik incelemesi (`guvenlik/incelemeler/v0.1.0.md`; `Sonuç:` satırını sen doldurursun)
-7. Etiket
-8. Taslak release
-9. Telefonda deneme (yukarıdaki liste)
-10. Yayımla
+## e) Yayın sırası (hiçbiri yapılmadı; push, etiket, release, secret ben yapmam)
+
+Arda'nın yapacakları:
+1. **Özel anahtarın ikinci yedeği.** `C:\Users\Arda\Documents\HabitTracker-anahtar\guncelleme-ozel-anahtar.b64` dosyasını bu diskten ve repolardan bağımsız bir yere kopyala (şifreli USB ya da parola yöneticisi notu). Kaybolursa güncelleme zinciri kopar.
+2. **GitHub secret `HABIT_UPDATE_SIGNING_KEY`.** Masaüstü repoda (`tungarix/habit-tracker`) Settings > Secrets and variables > Actions; değer o dosyanın içeriği. Sır yoksa `release.yml` imza adımında düşer, release oluşmaz.
+3. **Etiket.** Önce masaüstü `master`'ı push et, sonra `v1.4.0` etiketini `kaynak_ozet.json`'daki `kaynak_commit` ile AYNI commit'e at. Etiketten önce masaüstüne yeni commit girerse (özellikle `lib/core`, `lib/data`, `test`, `docs/senkron.md`) `tool/esitle.ps1 -Etiket v1.4.0` yeniden çalıştırılmalı. Release iş akışı zip + `SHA256SUMS.txt` + `.sig` üretir; taslak release'i kontrol et.
+4. **Telefon denemesi** (yukarıdaki c listesi; özellikle 11 ve 12: gerçek kamerayla QR, Wi-Fi, Güvenlik Duvarı sorusu, uygulama içi güncelleme).
+5. Masaüstü release'ini yayımla. Sonra mobilde `tool/esitle.ps1` (parametresiz) çalıştır, `etiketle_ayni: true` gör; mobil repoyu aç, CI ilk koşu (kaynak etiketi adımı bu noktada yeşile döner).
+6. Mobil güvenlik incelemesi (`Sonuç:` satırı), mobil etiket, taslak release (imzalı APK yalnız CI'dan), yayımla.
 
 ## f) Bilinen sınırlar
 
@@ -77,7 +82,7 @@ Faz 4 inceleme turu (bu güncelleme): iki depoda `flutter analyze` temiz; mobild
 - Faz 4 gerçek ağda ve gerçek cihazda hiç denenmedi: yalnız loopback testleri ve emülatörde 10.0.2.2 üzerinden bir akış. Kamerayla gerçek QR okuma, Windows Güvenlik Duvarı sorusu, gerçek telefon ve gerçek Wi-Fi yok. Sertifika kabulü yalnız bir emülatör imajında ve debug derlemede görüldü.
 - Kotlin `wifiBagli` (ücretli Wi-Fi düzeltmesi) derlenip çalıştırılmadı; yalnız Dart tarafı sahte köprüyle test edildi. VPN üzerinden Wi-Fi'da yanlış "Wi-Fi değil" çıkabilir (denenmedi).
 - Masaüstü sunucu portu artık 49152-65535 arasından seçiliyor (Linux için); Linux'ta denenmedi. Güncelleme bölümü Windows dışında gizli.
-- Masaüstü güncelleyicisi: gerçek kurucu, gerçek GitHub, SmartScreen/antivirüs davranışı denenmedi; paket imzasız (yalnız SHA-256); geri alma yalnız dosya kopyalama aşaması için.
+- Masaüstü güncelleyicisi: gerçek kurucu, gerçek GitHub, SmartScreen/antivirüs davranışı denenmedi; paket imzası Ed25519 ile doğrulanır (gerçek GitHub/CI'da denenmedi); geri alma yalnız dosya kopyalama aşaması için.
 - Eşleştirmede telefon sonuç yanıtını alamazsa "bilgisayarın sonucu belli değil" der; kullanıcı bilgisayardaki pencereye bakmalı. Birleştirme tekrarlanabilir (veri bozulmaz).
 - Veritabanı tetikleyicisi değeri değişmeyen UPDATE'i de düzenleme sayıyor; sıralama düzeltildi ama başka toplu yazma eklenirse aynı sorun doğar (`inceleme.md`, bulgu 4).
 - Mobil klasör artık git deposu (yerel `main`, uzak depo yok); `docs/faz4/ekran/` ve bazı raporlar önceki turdan işlenmemiş duruyor.

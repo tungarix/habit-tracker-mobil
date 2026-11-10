@@ -4,7 +4,10 @@
 #
 # Özet (SHA-256) satır sonları LF'ye çevrilerek hesaplanır: Windows (CRLF) ve CI (LF) aynı sonucu versin.
 param(
-    [string]$Kaynak = 'C:\Users\Arda\Desktop\Aktenak\Projeler\habit-tracker'
+    [string]$Kaynak = 'C:\Users\Arda\Desktop\Aktenak\Projeler\habit-tracker',
+    # Henüz atılmamış bir etiketi (örn. v1.4.0) hedefle: kaynak_ozet.json'a o ad + yerel commit SHA'sı yazılır.
+    # Etiket kaynakta varsa normal yol işler (etiketle karşılaştırılır).
+    [string]$Etiket = ''
 )
 $ErrorActionPreference = 'Stop'
 $kok = Split-Path $PSScriptRoot -Parent
@@ -32,7 +35,8 @@ Get-ChildItem "$Kaynak\lib\data\sync" -Filter *.dart | ForEach-Object { $liste.A
 $liste.Add('docs/senkron.md')
 # providers.dart bunu içe aktarır (saf Dart, arayüz yok).
 Get-ChildItem "$Kaynak\lib\data\models" -Filter *.dart | ForEach-Object { $liste.Add("lib/data/models/$($_.Name)") }
-Get-ChildItem "$Kaynak\test" -Filter *.dart | Where-Object {
+# wifi_*: masaüstü sunucusunun testleri (lib/core/wifi_sync mobile kopyalanmaz); mobilin kendi wifi_* testlerini ezmesin.
+Get-ChildItem "$Kaynak\test" -Filter *.dart | Where-Object Name -notlike 'wifi_*' | Where-Object {
     $_.Name -eq 'helpers.dart' -or -not (Select-String -Path $_.FullName -Pattern $testHaric -Quiet)
 } | ForEach-Object { $liste.Add("test/$($_.Name)") }
 
@@ -53,18 +57,21 @@ foreach ($g in ($liste | Sort-Object)) {
 }
 
 $sha = (git -C $Kaynak rev-parse HEAD).Trim()
-$etiket = (git -C $Kaynak describe --tags --abbrev=0).Trim()
+$etiket = if ($Etiket) { $Etiket } else { (git -C $Kaynak describe --tags --abbrev=0).Trim() }
+$etiketVar = [bool](git -C $Kaynak tag --list $etiket)
 # Kopyalar etiketteki dosyalarla birebir mi? (etiketten bu yana değişen / kirli dosya var mı)
-$kirli = @(git -C $Kaynak diff --name-only $etiket -- @($liste)) + @(git -C $Kaynak status --porcelain -- @($liste))
+# Etiket henüz yoksa karşılaştırma HEAD'e göre yapılır (yalnız commitlenmemiş değişiklik kirlidir).
+$karsi = if ($etiketVar) { $etiket } else { 'HEAD' }
+$kirli = @(git -C $Kaynak diff --name-only $karsi -- @($liste)) + @(git -C $Kaynak status --porcelain -- @($liste))
 if ($kirli.Count -gt 0) { Write-Warning "Kopyalanan dosyalar '$etiket' etiketiyle tutmuyor: $($kirli -join ', ')" }
 
 [ordered]@{
     kaynak           = 'tungarix/habit-tracker'
     kaynak_commit    = $sha
     etiket           = $etiket
-    etiketle_ayni    = ($kirli.Count -eq 0)
-    yayimlandi       = ($kirli.Count -eq 0)
-    not              = $(if ($kirli.Count -eq 0) { '' } else { "Kaynak $etiket sonrası YAYIMLANMAMIŞ bir dal (yerel commit $($sha.Substring(0,7))); etiket yok. Masaüstü v1.4.0 etiketlenince esitle yeniden çalıştırılmalı." })
+    etiketle_ayni    = ($etiketVar -and $kirli.Count -eq 0)
+    yayimlandi       = ($etiketVar -and $kirli.Count -eq 0)
+    not              = $(if (-not $etiketVar) { "$etiket (etiketlenecek): kaynak yerel commit $($sha.Substring(0,7)); etiket henüz yok. Arda etiketi AYNI commit'e atınca CI uyum bekçisi yeşile döner; etiketten önce kaynağa yeni commit eklenirse esitle yeniden çalıştırılmalı." } elseif ($kirli.Count -eq 0) { '' } else { "Kaynak $etiket sonrası YAYIMLANMAMIŞ bir dal (yerel commit $($sha.Substring(0,7))); etiket yok. Masaüstü v1.4.0 etiketlenince esitle yeniden çalıştırılmalı." })
     dosyalar         = $dosyalar
     bilincli_sapmalar = $sapmalar
     bilincli_farklar  = $farklar
