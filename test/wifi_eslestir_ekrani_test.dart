@@ -66,11 +66,14 @@ class SahneKaydi {
 }
 
 class SahteKopruWifi implements Kopru {
-  SahteKopruWifi(this.tur);
+  SahteKopruWifi(this.tur, {this.wifi});
   String tur;
+  final bool? wifi;
   int ayarAcildi = 0;
   @override
   Future<String> agTuru() async => tur;
+  @override
+  Future<bool> wifiBagli() async => wifi ?? tur == 'wifi';
   @override
   Future<void> uygulamaAyarlariniAc() async => ayarAcildi++;
   @override
@@ -296,6 +299,31 @@ void main() {
     },
   );
 
+  for (final kod in ['zaman_asimi', 'ag_ulasilamiyor', 'yanit_bozuk']) {
+    testWidgets(
+      'POST yanıtsız biterse ($kod): "bilgisayar değişmedi" denmez, sonuç belirsiz yazılır',
+      (tester) async {
+        final db = await bellekDb();
+        final k = SahneKaydi()
+          ..gelen = await masaustuDosyasi(['Kitap'])
+          ..gonderHatasi = kod;
+        await ac(tester, db, k, gecici());
+        await qrOkutVeBaglan(tester, k);
+        await tester.tap(find.text(Metin.wifiBirlestirGonder));
+        await bekle(tester, 24);
+        await tester.runAsync(
+          () => Future<void>.delayed(const Duration(milliseconds: 100)),
+        );
+        await bekle(tester, 12);
+        expect(find.text(Metin.wifiBelirsizBaslik), findsOneWidget);
+        expect(find.text(Metin.wifiBelirsizTelefon), findsOneWidget);
+        expect(find.text(Metin.wifiYarimTelefon), findsNothing);
+        expect(find.textContaining('bilgisayar değişmedi'), findsNothing);
+        await temizle(tester);
+      },
+    );
+  }
+
   testWidgets('bozuk masaüstü verisi: önizleme ve birleştirme yok', (
     tester,
   ) async {
@@ -348,6 +376,18 @@ void main() {
     await bekle(tester);
     expect(find.text(Metin.wifiHata('wifi_degil')), findsOneWidget);
     expect(find.byKey(const Key('sahte-tarayici')), findsNothing);
+    await temizle(tester);
+  });
+
+  testWidgets('ücretli (metered) işaretli Wi-Fi engellenmez', (tester) async {
+    final db = await bellekDb();
+    final k = SahneKaydi();
+    // agTuru 'mobil' döner (ücretli), ama etkin ağ Wi-Fi.
+    await ac(tester, db, k, gecici(), kopru: SahteKopruWifi('mobil', wifi: true));
+    await tester.tap(find.text(Metin.wifiQrTara));
+    await bekle(tester);
+    expect(find.text(Metin.wifiHata('wifi_degil')), findsNothing);
+    expect(find.byKey(const Key('sahte-tarayici')), findsOneWidget);
     await temizle(tester);
   });
 

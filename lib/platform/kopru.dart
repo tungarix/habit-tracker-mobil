@@ -1,5 +1,6 @@
 // Bridge to Android: MainActivity's method channel (no extra plugin).
 //  - agTuru: active network kind ('wifi' | 'mobil' | 'yok'),
+//  - wifiBagli: active network is Wi-Fi/Ethernet (even if marked metered),
 //  - kurulumIzniVar / kurulumIzniAc: "install unknown apps" permission,
 //  - apkKur: installs a verified APK through PackageInstaller,
 //  - uygulamaAyarlariniAc: this app's system settings page,
@@ -22,6 +23,9 @@ final kopruProvider = Provider<Kopru?>((ref) => null);
 abstract class Kopru {
   /// Active network kind: 'wifi' (unmetered) | 'mobil' (metered) | 'yok'.
   Future<String> agTuru();
+
+  /// Whether the active network is Wi-Fi or Ethernet, metered or not (LAN pairing uses no mobile data).
+  Future<bool> wifiBagli();
 
   /// Whether this app may install packages (Android 8+ "install unknown apps").
   Future<bool> kurulumIzniVar();
@@ -72,6 +76,10 @@ class AndroidKopru implements Kopru {
   @override
   Future<String> agTuru() async =>
       (await _kanal.invokeMethod<String>('agTuru')) ?? 'yok';
+
+  @override
+  Future<bool> wifiBagli() async =>
+      (await _kanal.invokeMethod<bool>('wifiBagli')) ?? false;
 
   @override
   Future<bool> kurulumIzniVar() async =>

@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.pm.PackageInstaller
 import android.os.Bundle
 import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
@@ -17,6 +18,7 @@ import java.io.File
 /**
  * Bridge to Dart (no extra plugin): in-app update only.
  *  - agTuru: 'wifi' (unmetered) | 'mobil' (metered) | 'yok',
+ *  - wifiBagli: active network is Wi-Fi or Ethernet, metered or not (LAN pairing),
  *  - kurulumIzniVar / kurulumIzniAc: "install unknown apps" permission,
  *  - apkKur: installs an APK from the app cache dir through a PackageInstaller session. Only an APK
  *    with this package name and a higher versionCode is accepted; the final word is Android's
@@ -63,6 +65,7 @@ class MainActivity : FlutterActivity() {
             k.setMethodCallHandler { cagri, sonuc ->
                 when (cagri.method) {
                     "agTuru" -> sonuc.success(agTuru())
+                    "wifiBagli" -> sonuc.success(wifiBagli())
                     "kurulumIzniVar" -> sonuc.success(Build.VERSION.SDK_INT < 26 || packageManager.canRequestPackageInstalls())
                     "kurulumIzniAc" -> {
                         startActivity(
@@ -95,6 +98,13 @@ class MainActivity : FlutterActivity() {
         val cm = getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
         if (cm.activeNetwork == null) return "yok"
         return if (cm.isActiveNetworkMetered) "mobil" else "wifi"
+    }
+
+    private fun wifiBagli(): Boolean {
+        val cm = getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
+        val yetenek = cm.getNetworkCapabilities(cm.activeNetwork ?: return false) ?: return false
+        return yetenek.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
+            yetenek.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)
     }
 
     private fun apkKur(yol: String?, ozet: String?, sonuc: MethodChannel.Result) {

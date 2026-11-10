@@ -86,6 +86,8 @@ class _SahteKopru implements Kopru {
   @override
   Future<String> agTuru() async => tur;
   @override
+  Future<bool> wifiBagli() async => tur == 'wifi';
+  @override
   Future<bool> kurulumIzniVar() async => izin;
   @override
   Future<void> kurulumIzniAc() async => izinAcildi++;

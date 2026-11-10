@@ -439,6 +439,14 @@ abstract final class Metin {
   static const wifiYarimBaslik = 'Yarım kaldı';
   static const wifiYarimTelefon =
       'Telefon güncellendi, ama bilgisayar değişmedi.';
+  static const wifiBelirsizBaslik = 'Bilgisayarın sonucu belli değil';
+  static const wifiBelirsizTelefon =
+      'Telefon güncellendi. Yanıt gelmediği için bilgisayara ulaşıp ulaşmadığı belli değil. '
+      'Bilgisayardaki pencere "tamamlandı" diyorsa iş bitmiştir; emin değilsen eşleştirmeyi yeniden yap, veri bozulmaz.';
+
+  /// Telefon verisi gönderildikten sonra yanıt alınamadı: bilgisayar birleştirmiş olabilir.
+  static bool wifiSonucBelirsizMi(String? kod) =>
+      kod == 'zaman_asimi' || kod == 'ag_ulasilamiyor' || kod == 'yanit_bozuk';
   static const wifiTamam = 'Tamam';
   static const wifiHataBaslik = 'Eşitlenemedi';
   static const wifiIptalEkran = 'Ekran kapandığı için eşleştirme iptal edildi.';

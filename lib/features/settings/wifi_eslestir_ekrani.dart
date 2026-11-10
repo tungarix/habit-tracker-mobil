@@ -112,7 +112,7 @@ class _WifiEslestirEkraniState extends ConsumerState<WifiEslestirEkrani>
     final k = ref.read(kopruProvider);
     if (k == null) return true; // köprü yok (test / Android dışı)
     try {
-      return await k.agTuru() == 'wifi';
+      return await k.wifiBagli();
     } catch (_) {
       return true; // ağ türü okunamadı: asıl bağlantı denemesi hatayı verir
     }
@@ -480,12 +480,18 @@ class _WifiEslestirEkraniState extends ConsumerState<WifiEslestirEkrani>
     final t = _telefonRapor!;
     final m = _masaustuRapor;
     final yarim = m == null;
+    // İstek bilgisayara ulaşmış olabilir: "değişmedi" demek yanlış olur.
+    final belirsiz = yarim && Metin.wifiSonucBelirsizMi(_masaustuHata);
     return [
       Semantics(
         liveRegion: true,
         header: true,
         child: Text(
-          yarim ? Metin.wifiYarimBaslik : Metin.wifiBitti,
+          !yarim
+              ? Metin.wifiBitti
+              : belirsiz
+              ? Metin.wifiBelirsizBaslik
+              : Metin.wifiYarimBaslik,
           style: Theme.of(context).textTheme.titleMedium,
         ),
       ),
@@ -495,7 +501,7 @@ class _WifiEslestirEkraniState extends ConsumerState<WifiEslestirEkrani>
       if (m != null)
         Text(Metin.wifiBilgisayarSonuc(m.eklenen, m.guncellenen, m.silinen)),
       if (yarim) ...[
-        const Text(Metin.wifiYarimTelefon),
+        Text(belirsiz ? Metin.wifiBelirsizTelefon : Metin.wifiYarimTelefon),
         const SizedBox(height: 8),
         Text(Metin.wifiHata(_masaustuHata ?? 'uygulama_hatasi')),
       ],
