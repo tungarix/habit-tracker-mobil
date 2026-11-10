@@ -53,3 +53,7 @@ kaynak-etiket/
 kaynak-master/
 *.jks
 *.keystore
+
+# Gradle/Flutter derleme ciktilari (her dizinde)
+android/build/
+**/build/

@@ -13,6 +13,7 @@ analyzer:
   exclude:
     - build/**
     - android/**
+    - tool/spike_tls/**
     - kaynak-etiket/**
     - kaynak-master/**
 

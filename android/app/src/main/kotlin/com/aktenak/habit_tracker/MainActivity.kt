@@ -150,25 +150,31 @@ class MainActivity : FlutterActivity() {
             setIntent(Intent())
             return
         }
-        val sonuc: Map<String, Any> = try {
-            val sinir = 16 * 1024 * 1024
-            val cikti = ByteArrayOutputStream()
-            contentResolver.openInputStream(uri).use { girdi ->
-                if (girdi == null) throw IllegalStateException("dosya açılamadı")
-                val tampon = ByteArray(64 * 1024)
-                while (true) {
-                    val n = girdi.read(tampon)
-                    if (n < 0) break
-                    cikti.write(tampon, 0, n)
-                    if (cikti.size() > sinir) throw IllegalStateException("dosya çok büyük (en çok 16 MB)")
-                }
-            }
-            mapOf("bayt" to cikti.toByteArray())
-        } catch (e: Exception) {
-            mapOf("hata" to (e.message ?: e.javaClass.simpleName))
-        }
+        // The file is read off the main thread (a slow or hung content provider must not cause an ANR);
+        // Throwable, so an OutOfMemoryError on a huge stream becomes an error message, not a crash.
         // The same file must not be handled again (e.g. on coming back to the foreground).
         setIntent(Intent())
-        if (dartHazir && kanal != null) kanal?.invokeMethod("dosyaGeldi", sonuc) else bekleyen = sonuc
+        Thread {
+            val sonuc: Map<String, Any> = try {
+                val sinir = 16 * 1024 * 1024
+                val cikti = ByteArrayOutputStream()
+                contentResolver.openInputStream(uri).use { girdi ->
+                    if (girdi == null) throw IllegalStateException("dosya açılamadı")
+                    val tampon = ByteArray(64 * 1024)
+                    while (true) {
+                        val n = girdi.read(tampon)
+                        if (n < 0) break
+                        cikti.write(tampon, 0, n)
+                        if (cikti.size() > sinir) throw IllegalStateException("dosya çok büyük (en çok 16 MB)")
+                    }
+                }
+                mapOf("bayt" to cikti.toByteArray())
+            } catch (e: Throwable) {
+                mapOf("hata" to (e.message ?: e.javaClass.simpleName))
+            }
+            runOnUiThread {
+                if (dartHazir && kanal != null) kanal?.invokeMethod("dosyaGeldi", sonuc) else bekleyen = sonuc
+            }
+        }.start()
     }
 }

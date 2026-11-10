@@ -105,10 +105,8 @@ void main() {
     );
   }
 
-  testWidgets('Bugün ve Görevler ekranlarında 12 px altı yazı yok', (
-    tester,
-  ) async {
-    telefonBoyutu(tester);
+  testWidgets('Tüm ekranlarda 12 px altı yazı yok', (tester) async {
+    telefonBoyutu(tester, yukseklik: 900);
     final db = await bellekDb();
     await aliskanlikEkle(db, 'Su', kind: 'count', target: 8);
     await uygulamaAc(tester, db);
@@ -122,13 +120,29 @@ void main() {
       }
     }
 
+    Future<void> sekme(String ad) async {
+      await tester.tap(find.descendant(
+        of: find.byType(NavigationBar),
+        matching: find.text(ad),
+      ));
+      await bekle(tester);
+      tara();
+    }
+
     tara();
-    await tester.tap(find.descendant(
-      of: find.byType(NavigationBar),
-      matching: find.text(Metin.sekmeGorevler),
-    ));
-    await bekle(tester);
-    tara();
+    await sekme(Metin.sekmeGorevler);
+    await sekme(Metin.sekmeAylik);
+    await sekme(Metin.sekmeIstatistik);
+    await sekme(Metin.sekmeBugun);
+    for (final ad in [Metin.menuAliskanliklar, Metin.menuAyarlar]) {
+      await tester.tap(find.byTooltip(Metin.menu));
+      await bekle(tester);
+      await tester.tap(find.text(ad));
+      await bekle(tester);
+      tara();
+      Navigator.of(tester.element(find.byType(Scaffold).last)).pop();
+      await bekle(tester);
+    }
     await temizle(tester);
   });
 }
