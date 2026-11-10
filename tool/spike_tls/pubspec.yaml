@@ -1,0 +1,8 @@
+name: spike_tls
+description: Throwaway spike - self-signed HTTPS server in pure Dart.
+publish_to: none
+environment:
+  sdk: ^3.0.0
+dependencies:
+  basic_utils: ^5.8.2
+  crypto: ^3.0.0
