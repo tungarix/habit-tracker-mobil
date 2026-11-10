@@ -32,8 +32,8 @@ class MonthlyScreen extends ConsumerStatefulWidget {
 
 class _MonthlyScreenState extends ConsumerState<MonthlyScreen> {
   static const double _labelW = 120;
-  static const double _cellW = 44;
-  static const double _rowH = 44;
+  static const double _cellW = 48;
+  static const double _rowH = 48;
   static const double _headerH = 56;
   static const double _moodH = 120;
 
@@ -379,7 +379,7 @@ class _GridCell extends ConsumerWidget {
     void longPress() =>
         enterHabitAmount(context, ref, habit, day, currentValue: value);
 
-    // The InkWell spans the whole 44px cell (touch target); the coloured
+    // The InkWell spans the whole 48dp cell (touch target); the coloured
     // box inside is inset 3px for the paper-grid look. The semantics node is
     // built by hand so TalkBack reads "Kitap, 12 Kasım: yapıldı" and the
     // glyph inside is not read a second time.

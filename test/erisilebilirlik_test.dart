@@ -50,9 +50,7 @@ void main() {
     });
   }
 
-  // Aylık, İstatistik, Alışkanlıklar and Ayarlar, both themes. Aylık is exempt from the 48 dp
-  // rule only: PLAN Faz 1 asks for 44 px cells there (a deliberate conflict with the 48 dp
-  // rule, reported to Arda); labels and contrast still apply to it.
+  // Aylık, İstatistik, Alışkanlıklar ve Ayarlar, iki tema; Aylık hücreleri de 48 dp.
   for (final koyu in [false, true]) {
     testWidgets(
       'erişilebilirlik: Aylık, İstatistik, Alışkanlıklar, Ayarlar (${koyu ? "koyu" : "açık"})',
@@ -84,7 +82,7 @@ void main() {
         }
 
         await sekme(Metin.sekmeAylik);
-        await denetle(dokunma: false);
+        await denetle();
         await sekme(Metin.sekmeIstatistik);
         await denetle();
         await sekme(Metin.sekmeBugun);

@@ -27,7 +27,7 @@ void main() {
     final first = DateTime(t.year, t.month, 1);
     final labelBefore = tester.getTopLeft(find.text('Kitap'));
     final cellBefore = tester.getTopLeft(_hucre(id, first));
-    expect(tester.getSize(_hucre(id, first)), const Size(44, 44));
+    expect(tester.getSize(_hucre(id, first)), const Size(48, 48));
 
     await tester.drag(_hucre(id, first), const Offset(-300, 0));
     await tester.pumpAndSettle();
