@@ -30,6 +30,9 @@ abstract class BildirimKapisi {
   Future<void> odakBitisiKur({required DateTime bitis, required String baslik, required String govde});
 
   Future<void> odakBitisiIptal();
+
+  /// Asks for the notification permissions; call it from a user action (first timer / reminder).
+  Future<void> izinIste();
 }
 
 String hatirlaticiGovdesi(int? bekleyen) => bekleyen == null
@@ -65,6 +68,7 @@ class YerelBildirimler implements BildirimKapisi {
 
   /// Asks for the notification permission (Android 13+) and, on Android 12, the exact-alarm
   /// permission. Call it from a user action: first reminder turned on / first timer started.
+  @override
   Future<void> izinIste() async {
     final a = _android;
     await a?.requestNotificationsPermission();

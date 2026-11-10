@@ -11,7 +11,7 @@ import '../../shared/habit_style.dart';
 import '../../shared/theme.dart';
 import '../../shared/widgets/status_mark.dart';
 import '../habits/habit_edit_dialog.dart';
-import '../settings/ui_metin_b.dart';
+import '../../ui_metin.dart';
 
 /// Monthly grid, laid out like a classic paper tracker: rows are habits,
 /// columns are the days of the month. Tap a cell to cycle ✓ → ✗ → – → boş.
@@ -128,7 +128,7 @@ class _MonthlyScreenState extends ConsumerState<MonthlyScreen> {
             child: Semantics(
               header: true,
               child: Text(
-                '${MetinB.aylar[_month.month - 1]} ${_month.year}',
+                '${Metin.aylar[_month.month - 1]} ${_month.year}',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
@@ -143,15 +143,15 @@ class _MonthlyScreenState extends ConsumerState<MonthlyScreen> {
               onPressed: () => setState(
                 () => _month = firstOfMonth(ref.read(todayProvider)),
               ),
-              child: const Text(MetinB.bugunDon),
+              child: const Text(Metin.bugunDon),
             ),
           IconButton(
-            tooltip: MetinB.oncekiAy,
+            tooltip: Metin.oncekiAy,
             icon: const Icon(Icons.chevron_left),
             onPressed: () => _shiftMonth(-1),
           ),
           IconButton(
-            tooltip: MetinB.sonrakiAy,
+            tooltip: Metin.sonrakiAy,
             icon: const Icon(Icons.chevron_right),
             onPressed: () => _shiftMonth(1),
           ),
@@ -203,7 +203,7 @@ class _MonthlyScreenState extends ConsumerState<MonthlyScreen> {
               child: Padding(
                 padding: const EdgeInsets.only(left: 12),
                 child: Text(
-                  MetinB.mood,
+                  Metin.mood,
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
@@ -233,7 +233,7 @@ class _MonthlyScreenState extends ConsumerState<MonthlyScreen> {
   Widget _dayHeaderCell(AppColors colors, DateTime day, DateTime t) {
     final isToday = day == t;
     return Semantics(
-      label: MetinB.gunBasligi(day, isToday),
+      label: Metin.aylikGunBasligi(day, isToday),
       excludeSemantics: true,
       child: SizedBox(
         width: _cellW,
@@ -379,7 +379,7 @@ class _GridCell extends ConsumerWidget {
     // built by hand so TalkBack reads "Kitap, 12 Kasım: yapıldı" and the
     // glyph inside is not read a second time.
     return Semantics(
-      label: MetinB.hucreEtiketi(
+      label: Metin.hucreEtiketi(
         habitName: habit.name,
         day: day,
         status: status,
@@ -455,7 +455,7 @@ class _MoodLine extends ConsumerWidget {
       height: height,
       child: recorded > 0
           ? Semantics(
-              label: MetinB.moodGrafigiEtiketi(recorded),
+              label: Metin.moodGrafigiEtiketi(recorded),
               image: true,
               excludeSemantics: true,
               child: CustomPaint(
@@ -474,7 +474,7 @@ class _MoodLine extends ConsumerWidget {
               child: Padding(
                 padding: const EdgeInsets.only(left: 8),
                 child: Text(
-                  MetinB.buAyMoodYok,
+                  Metin.buAyMoodYok,
                   style: TextStyle(fontSize: 12, color: colors.textDim),
                 ),
               ),
@@ -586,12 +586,12 @@ class _EmptyState extends StatelessWidget {
             Icon(Icons.grid_view_rounded, size: 64, color: colors.textDim),
             const SizedBox(height: 16),
             const Text(
-              MetinB.alsizBaslik,
+              Metin.alsizBaslik,
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 6),
             Text(
-              MetinB.alsizAciklama,
+              Metin.alsizAciklama,
               textAlign: TextAlign.center,
               style: TextStyle(color: colors.textDim),
             ),
@@ -599,7 +599,7 @@ class _EmptyState extends StatelessWidget {
             FilledButton.icon(
               onPressed: onAdd,
               icon: const Icon(Icons.add),
-              label: const Text(MetinB.alisanlikEkle),
+              label: const Text(Metin.alisanlikEkle),
             ),
           ],
         ),

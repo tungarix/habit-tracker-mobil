@@ -1,7 +1,7 @@
 import 'package:aktenak_habit_tracker/core/enums.dart';
 import 'package:aktenak_habit_tracker/data/database/database.dart';
 import 'package:aktenak_habit_tracker/features/habits/habits_screen.dart';
-import 'package:aktenak_habit_tracker/features/settings/ui_metin_b.dart';
+import 'package:aktenak_habit_tracker/ui_metin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -20,9 +20,9 @@ void main() {
     final db = await bellekDb();
     await ac(tester, db, const HabitsScreen());
 
-    await tester.tap(find.text(MetinB.alisanlikFab));
+    await tester.tap(find.text(Metin.alisanlikFab));
     await tester.pumpAndSettle();
-    expect(find.text(MetinB.yeniAlisanlik), findsOneWidget);
+    expect(find.text(Metin.yeniAlisanlik), findsOneWidget);
 
     await tester.enterText(_diyalogAlanlari().first, 'Deneme alışkanlık');
     await tester.tap(find.text(HabitKind.count.label));
@@ -30,10 +30,10 @@ void main() {
     await tester.enterText(_diyalogAlanlari().last, '3');
     await tester.tap(find.text(HabitCategory.zihin.label));
     await tester.pumpAndSettle();
-    await tester.tap(find.text(MetinB.kaydet));
+    await tester.tap(find.text(Metin.kaydet));
     await tester.pumpAndSettle();
 
-    expect(find.text(MetinB.yeniAlisanlik), findsNothing);
+    expect(find.text(Metin.yeniAlisanlik), findsNothing);
     final habits = await db.getAllHabits();
     expect(habits, hasLength(1));
     expect(habits.single.name, 'Deneme alışkanlık');
@@ -50,12 +50,12 @@ void main() {
     final db = await bellekDb();
     await ac(tester, db, const HabitsScreen());
 
-    await tester.tap(find.text(MetinB.alisanlikFab));
+    await tester.tap(find.text(Metin.alisanlikFab));
     await tester.pumpAndSettle();
-    await tester.tap(find.text(MetinB.kaydet));
+    await tester.tap(find.text(Metin.kaydet));
     await tester.pumpAndSettle();
 
-    expect(find.text(MetinB.yeniAlisanlik), findsOneWidget);
+    expect(find.text(Metin.yeniAlisanlik), findsOneWidget);
     expect(await db.getAllHabits(), isEmpty);
 
     await temizle(tester);
@@ -69,16 +69,16 @@ void main() {
     final db = await bellekDb();
     await ac(tester, db, const HabitsScreen());
 
-    await tester.tap(find.text(MetinB.alisanlikFab));
+    await tester.tap(find.text(Metin.alisanlikFab));
     await tester.pumpAndSettle();
     await tester.enterText(_diyalogAlanlari().first, 'Renkli');
-    final kirmizi = find.bySemanticsLabel(MetinB.renkAdi(4));
+    final kirmizi = find.bySemanticsLabel(Metin.renkAdi(4));
     await tester.ensureVisible(kirmizi);
     expect(tester.getSize(kirmizi).shortestSide, greaterThanOrEqualTo(48));
     await tester.tap(kirmizi);
     await tester.tap(find.widgetWithText(FilterChip, 'Pzt'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text(MetinB.kaydet));
+    await tester.tap(find.text(Metin.kaydet));
     await tester.pumpAndSettle();
 
     final h = (await db.getAllHabits()).single;
@@ -97,10 +97,10 @@ void main() {
 
     await tester.tap(find.byType(PopupMenuButton<String>));
     await tester.pumpAndSettle();
-    await tester.tap(find.text(MetinB.duzenle));
+    await tester.tap(find.text(Metin.duzenle));
     await tester.pumpAndSettle();
     await tester.enterText(_diyalogAlanlari().first, 'Yeni ad');
-    await tester.tap(find.text(MetinB.kaydet));
+    await tester.tap(find.text(Metin.kaydet));
     await tester.pumpAndSettle();
 
     expect((await db.getAllHabits()).single.name, 'Yeni ad');
@@ -142,13 +142,13 @@ void main() {
       tester,
     ) async {
       await menuAc(tester, 'Gitar');
-      await tester.tap(find.text(MetinB.silNokta));
+      await tester.tap(find.text(Metin.silNokta));
       await tester.pumpAndSettle();
 
-      expect(find.text(MetinB.kaliciSilBaslik), findsOneWidget);
+      expect(find.text(Metin.kaliciSilBaslik), findsOneWidget);
       expect(find.textContaining('Arşivle'), findsWidgets);
 
-      await tester.tap(find.widgetWithText(FilledButton, MetinB.sil));
+      await tester.tap(find.widgetWithText(FilledButton, Metin.sil));
       await tester.pumpAndSettle();
 
       expect((await db.getAllHabits()).map((h) => h.name), ['Kitap']);
@@ -161,9 +161,9 @@ void main() {
 
     testWidgets('İptal leaves the habit alone', (tester) async {
       await menuAc(tester, 'Gitar');
-      await tester.tap(find.text(MetinB.silNokta));
+      await tester.tap(find.text(Metin.silNokta));
       await tester.pumpAndSettle();
-      await tester.tap(find.text(MetinB.iptal));
+      await tester.tap(find.text(Metin.iptal));
       await tester.pumpAndSettle();
 
       expect(await db.getAllHabits(), hasLength(2));
@@ -176,15 +176,15 @@ void main() {
       'archive moves it to the archive list, restore brings it back',
       (tester) async {
         await menuAc(tester, 'Gitar');
-        await tester.tap(find.text(MetinB.arsivle));
+        await tester.tap(find.text(Metin.arsivle));
         await tester.pumpAndSettle();
 
-        expect(find.text(MetinB.arsiv), findsOneWidget);
-        expect(find.byTooltip(MetinB.geriYukle), findsOneWidget);
+        expect(find.text(Metin.arsiv), findsOneWidget);
+        expect(find.byTooltip(Metin.geriYukle), findsOneWidget);
 
-        await tester.tap(find.byTooltip(MetinB.geriYukle));
+        await tester.tap(find.byTooltip(Metin.geriYukle));
         await tester.pumpAndSettle();
-        expect(find.text(MetinB.arsiv), findsNothing);
+        expect(find.text(Metin.arsiv), findsNothing);
         expect(find.text('Gitar'), findsOneWidget);
 
         await temizle(tester);

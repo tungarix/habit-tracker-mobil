@@ -7,7 +7,7 @@ import '../../core/enums.dart';
 import '../../data/database/database.dart';
 import '../../data/providers.dart';
 import '../../shared/widgets/habit_avatar.dart';
-import '../settings/ui_metin_b.dart';
+import '../../ui_metin.dart';
 import 'habit_edit_dialog.dart';
 
 /// Manage habits: create, edit, archive, restore, delete.
@@ -20,16 +20,16 @@ class HabitsScreen extends ConsumerWidget {
     final archivedAsync = ref.watch(archivedHabitsProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text(MetinB.alisanliklariYonet)),
+      appBar: AppBar(title: const Text(Metin.alisanliklariYonet)),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => HabitEditDialog.show(context),
         icon: const Icon(Icons.add),
-        label: const Text(MetinB.alisanlikFab),
+        label: const Text(Metin.alisanlikFab),
       ),
       body: SafeArea(
         child: activeAsync.when(
           loading: () => const Center(child: CircularProgressIndicator()),
-          error: (e, _) => Center(child: Text(MetinB.hata('$e'))),
+          error: (e, _) => Center(child: Text(Metin.hata('$e'))),
           data: (active) {
             final archived = archivedAsync.value ?? const <Habit>[];
             return CustomScrollView(
@@ -38,7 +38,7 @@ class HabitsScreen extends ConsumerWidget {
                   const SliverToBoxAdapter(
                     child: Padding(
                       padding: EdgeInsets.all(24),
-                      child: Center(child: Text(MetinB.aktifYok)),
+                      child: Center(child: Text(Metin.aktifYok)),
                     ),
                   ),
                 SliverPadding(
@@ -70,7 +70,7 @@ class HabitsScreen extends ConsumerWidget {
                       child: Semantics(
                         header: true,
                         child: const Text(
-                          MetinB.arsiv,
+                          Metin.arsiv,
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ),
@@ -112,7 +112,7 @@ class _ActiveHabitTile extends ConsumerWidget {
     final repo = ref.read(habitRepositoryProvider);
     final days = parseWeekdays(habit.scheduledWeekdays);
     final schedule = days.isEmpty
-        ? MetinB.herGun
+        ? Metin.herGun
         : days.map((d) => kWeekdayShort[d - 1]).join(' · ');
     final category = HabitCategory.tryParse(habit.category);
     final subtitle = category == null
@@ -142,7 +142,7 @@ class _ActiveHabitTile extends ConsumerWidget {
               ),
             ),
             PopupMenuButton<String>(
-              tooltip: MetinB.menuAc(habit.name),
+              tooltip: Metin.menuAc(habit.name),
               onSelected: (value) {
                 switch (value) {
                   case 'edit':
@@ -154,9 +154,9 @@ class _ActiveHabitTile extends ConsumerWidget {
                 }
               },
               itemBuilder: (_) => const [
-                PopupMenuItem(value: 'edit', child: Text(MetinB.duzenle)),
-                PopupMenuItem(value: 'archive', child: Text(MetinB.arsivle)),
-                PopupMenuItem(value: 'delete', child: Text(MetinB.silNokta)),
+                PopupMenuItem(value: 'edit', child: Text(Metin.duzenle)),
+                PopupMenuItem(value: 'archive', child: Text(Metin.arsivle)),
+                PopupMenuItem(value: 'delete', child: Text(Metin.silNokta)),
               ],
             ),
           ],
@@ -183,12 +183,12 @@ class _ArchivedHabitTile extends ConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               IconButton(
-                tooltip: MetinB.geriYukle,
+                tooltip: Metin.geriYukle,
                 icon: const Icon(Icons.unarchive_outlined),
                 onPressed: () => repo.unarchive(habit.id),
               ),
               IconButton(
-                tooltip: MetinB.sil,
+                tooltip: Metin.sil,
                 icon: const Icon(Icons.delete_outline),
                 onPressed: () => confirmDeleteHabit(context, ref, habit),
               ),
@@ -214,12 +214,12 @@ Future<void> confirmDeleteHabit(
   final ok = await showDialog<bool>(
     context: context,
     builder: (dialogContext) => AlertDialog(
-      title: const Text(MetinB.kaliciSilBaslik),
-      content: Text(MetinB.kaliciSilAciklama(habit.name, offerArchive)),
+      title: const Text(Metin.kaliciSilBaslik),
+      content: Text(Metin.kaliciSilAciklama(habit.name, offerArchive)),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(dialogContext, false),
-          child: const Text(MetinB.iptal),
+          child: const Text(Metin.iptal),
         ),
         FilledButton(
           style: FilledButton.styleFrom(
@@ -227,7 +227,7 @@ Future<void> confirmDeleteHabit(
             foregroundColor: Theme.of(dialogContext).colorScheme.onError,
           ),
           onPressed: () => Navigator.pop(dialogContext, true),
-          child: const Text(MetinB.sil),
+          child: const Text(Metin.sil),
         ),
       ],
     ),

@@ -8,7 +8,7 @@ import 'package:aktenak_habit_tracker/data/repositories/backup_repository.dart';
 import 'package:aktenak_habit_tracker/features/settings/backup_file_service.dart';
 import 'package:aktenak_habit_tracker/features/settings/reminder_settings.dart';
 import 'package:aktenak_habit_tracker/features/settings/settings_screen.dart';
-import 'package:aktenak_habit_tracker/features/settings/ui_metin_b.dart';
+import 'package:aktenak_habit_tracker/ui_metin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -91,10 +91,14 @@ void main() {
       of: find.byType(SegmentedButton<ThemeMode>),
       matching: find.text(label),
     );
-    await tester.tap(segment(MetinB.temaSistem));
+    // The phone defaults to Sistem, so pick Koyu first to see a real change.
+    await tester.tap(segment(Metin.temaKoyu));
+    await kisaBekle(tester);
+    expect(await db.getSetting(AppConstants.themeModeKey), 'dark');
+    await tester.tap(segment(Metin.temaSistem));
     await kisaBekle(tester);
     expect(await db.getSetting(AppConstants.themeModeKey), 'system');
-    await tester.tap(segment(MetinB.temaAcik));
+    await tester.tap(segment(Metin.temaAcik));
     await kisaBekle(tester);
     expect(await db.getSetting(AppConstants.themeModeKey), 'light');
 
@@ -106,7 +110,7 @@ void main() {
     await habitEkle(db, 'Kitap');
     await ekraniAc(tester, db);
 
-    await tester.tap(find.text(MetinB.disaAktar));
+    await tester.tap(find.text(Metin.disaAktar));
     await kisaBekle(tester);
 
     expect(dosya.paylasilanAd, startsWith('aktenak-backup-'));
@@ -125,10 +129,10 @@ void main() {
     dosya.secilecek = await ornekYedek();
     await ekraniAc(tester, db);
 
-    await tester.tap(find.text(MetinB.iceAktar));
+    await tester.tap(find.text(Metin.iceAktar));
     await kisaBekle(tester);
-    expect(find.text(MetinB.iceAktarModuBaslik), findsOneWidget);
-    await tester.tap(find.text(MetinB.birlestir));
+    expect(find.text(Metin.iceAktarModuBaslik), findsOneWidget);
+    await tester.tap(find.text(Metin.birlestir));
     await kisaBekle(tester);
 
     final adlar = (await db.getAllHabits()).map((h) => h.name).toSet();
@@ -146,9 +150,9 @@ void main() {
     dosya.secilecek = await ornekYedek();
     await ekraniAc(tester, db);
 
-    await tester.tap(find.text(MetinB.iceAktar));
+    await tester.tap(find.text(Metin.iceAktar));
     await kisaBekle(tester);
-    await tester.tap(find.text(MetinB.tamamenDegistir));
+    await tester.tap(find.text(Metin.tamamenDegistir));
     await kisaBekle(tester);
 
     final adlar = (await db.getAllHabits()).map((h) => h.name).toList();
@@ -165,16 +169,16 @@ void main() {
     await ekraniAc(tester, db);
 
     // Picker cancelled: no dialog at all.
-    await tester.tap(find.text(MetinB.iceAktar));
+    await tester.tap(find.text(Metin.iceAktar));
     await kisaBekle(tester);
     expect(dosya.secimSayisi, 1);
-    expect(find.text(MetinB.iceAktarModuBaslik), findsNothing);
+    expect(find.text(Metin.iceAktarModuBaslik), findsNothing);
 
     // File picked, mode dialog dismissed with İptal.
     dosya.secilecek = await ornekYedek();
-    await tester.tap(find.text(MetinB.iceAktar));
+    await tester.tap(find.text(Metin.iceAktar));
     await kisaBekle(tester);
-    await tester.tap(find.text(MetinB.iptal));
+    await tester.tap(find.text(Metin.iptal));
     await kisaBekle(tester);
     expect((await db.getAllHabits()).map((h) => h.name), ['Mevcut']);
 
@@ -189,9 +193,9 @@ void main() {
     dosya.secilecek = 'bu bir yedek değil';
     await ekraniAc(tester, db);
 
-    await tester.tap(find.text(MetinB.iceAktar));
+    await tester.tap(find.text(Metin.iceAktar));
     await kisaBekle(tester);
-    await tester.tap(find.text(MetinB.tamamenDegistir));
+    await tester.tap(find.text(Metin.tamamenDegistir));
     await kisaBekle(tester);
 
     expect(find.textContaining('İçe aktarım başarısız'), findsOneWidget);

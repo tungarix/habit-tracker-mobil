@@ -6,17 +6,11 @@ import '../data/providers.dart';
 
 /// Theme preference for the phone: same settings key as the desktop
 /// `themeModeProvider`, but defaults to "follow the system" (PLAN) instead of
-/// dark. A separate provider because `data/providers.dart` is a synced copy.
-///
-/// shortcut: the Settings screen still writes through `themeModeProvider`
-/// (dark by default); this mirrors its changes. Choosing "Koyu" while nothing
-/// is stored yet is not a change for that provider, so the app switches only
-/// on the next start. Fix: default `themeModeProvider` to system (declared
-/// deviation in kaynak_ozet.json) and drop this file.
+/// dark. A separate provider because `data/providers.dart` is a synced copy;
+/// the app and the Settings screen both use this one, never the desktop one.
 class TemaModuNotifier extends Notifier<ThemeMode> {
   @override
   ThemeMode build() {
-    ref.listen(themeModeProvider, (_, next) => state = next);
     _load();
     return ThemeMode.system;
   }

@@ -8,7 +8,7 @@ import '../../core/enums.dart';
 import '../../data/database/database.dart';
 import '../../data/providers.dart';
 import '../../shared/habit_style.dart';
-import '../settings/ui_metin_b.dart';
+import '../../ui_metin.dart';
 
 /// Add / edit a habit. Pass [existing] to edit, leave null to create.
 class HabitEditDialog extends ConsumerStatefulWidget {
@@ -111,7 +111,7 @@ class _HabitEditDialogState extends ConsumerState<HabitEditDialog> {
   Widget build(BuildContext context) {
     final dim = Theme.of(context).colorScheme.onSurfaceVariant;
     return AlertDialog(
-      title: Text(_isEdit ? MetinB.alisanligiDuzenle : MetinB.yeniAlisanlik),
+      title: Text(_isEdit ? Metin.alisanligiDuzenle : Metin.yeniAlisanlik),
       content: SizedBox(
         width: 380,
         child: SingleChildScrollView(
@@ -124,17 +124,17 @@ class _HabitEditDialogState extends ConsumerState<HabitEditDialog> {
                 autofocus: true,
                 textInputAction: TextInputAction.next,
                 decoration: const InputDecoration(
-                  labelText: MetinB.ad,
-                  hintText: MetinB.adIpucu,
+                  labelText: Metin.ad,
+                  hintText: Metin.adIpucu,
                 ),
               ),
               const SizedBox(height: 12),
               TextField(
                 controller: _desc,
-                decoration: const InputDecoration(labelText: MetinB.aciklama),
+                decoration: const InputDecoration(labelText: Metin.aciklama),
               ),
               const SizedBox(height: 20),
-              const _SectionLabel(MetinB.tur),
+              const _SectionLabel(Metin.tur),
               const SizedBox(height: 8),
               Wrap(
                 spacing: 8,
@@ -153,15 +153,15 @@ class _HabitEditDialogState extends ConsumerState<HabitEditDialog> {
                   controller: _target,
                   keyboardType: TextInputType.number,
                   decoration: const InputDecoration(
-                    labelText: MetinB.gunlukHedef,
-                    hintText: MetinB.gunlukHedefIpucu,
-                    helperText: MetinB.gunlukHedefYardim,
+                    labelText: Metin.gunlukHedefAlan,
+                    hintText: Metin.gunlukHedefIpucu,
+                    helperText: Metin.gunlukHedefYardim,
                     helperMaxLines: 2,
                   ),
                 ),
               ],
               const SizedBox(height: 20),
-              const _SectionLabel(MetinB.kategori),
+              const _SectionLabel(Metin.kategori),
               const SizedBox(height: 8),
               Wrap(
                 spacing: 8,
@@ -175,14 +175,14 @@ class _HabitEditDialogState extends ConsumerState<HabitEditDialog> {
                 ],
               ),
               const SizedBox(height: 20),
-              const _SectionLabel(MetinB.renk),
+              const _SectionLabel(Metin.renk),
               const SizedBox(height: 4),
               _ColorPicker(
                 selected: _colorValue,
                 onSelected: (c) => setState(() => _colorValue = c),
               ),
               const SizedBox(height: 20),
-              const _SectionLabel(MetinB.ikon),
+              const _SectionLabel(Metin.ikon),
               const SizedBox(height: 4),
               _IconPicker(
                 selectedCodePoint: _iconCodePoint,
@@ -190,10 +190,10 @@ class _HabitEditDialogState extends ConsumerState<HabitEditDialog> {
                 onSelected: (cp) => setState(() => _iconCodePoint = cp),
               ),
               const SizedBox(height: 20),
-              const _SectionLabel(MetinB.planliGunler),
+              const _SectionLabel(Metin.planliGunler),
               const SizedBox(height: 4),
               Text(
-                _weekdays.isEmpty ? MetinB.herGun : MetinB.seciliGunlerde,
+                _weekdays.isEmpty ? Metin.herGun : Metin.seciliGunlerde,
                 style: TextStyle(color: dim, fontSize: 12),
               ),
               const SizedBox(height: 8),
@@ -208,9 +208,9 @@ class _HabitEditDialogState extends ConsumerState<HabitEditDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text(MetinB.iptal),
+          child: const Text(Metin.iptal),
         ),
-        FilledButton(onPressed: _save, child: const Text(MetinB.kaydet)),
+        FilledButton(onPressed: _save, child: const Text(Metin.kaydet)),
       ],
     );
   }
@@ -268,7 +268,7 @@ class _ColorPicker extends StatelessWidget {
       children: [
         for (var i = 0; i < kHabitColors.length; i++)
           _PickerCell(
-            label: MetinB.renkAdi(i),
+            label: Metin.renkAdi(i),
             selected: kHabitColors[i].toARGB32() == selected,
             onTap: () => onSelected(kHabitColors[i].toARGB32()),
             child: Container(
@@ -311,7 +311,7 @@ class _IconPicker extends StatelessWidget {
       children: [
         for (var i = 0; i < kHabitIcons.length; i++)
           _PickerCell(
-            label: MetinB.ikonAdi(i),
+            label: Metin.ikonAdi(i),
             selected: kHabitIcons[i].codePoint == selectedCodePoint,
             onTap: () => onSelected(kHabitIcons[i].codePoint),
             child: Container(

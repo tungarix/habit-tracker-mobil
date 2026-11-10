@@ -2,7 +2,7 @@ import 'package:aktenak_habit_tracker/core/date_utils.dart';
 import 'package:aktenak_habit_tracker/core/enums.dart';
 import 'package:aktenak_habit_tracker/data/database/database.dart';
 import 'package:aktenak_habit_tracker/features/monthly/monthly_screen.dart';
-import 'package:aktenak_habit_tracker/features/settings/ui_metin_b.dart';
+import 'package:aktenak_habit_tracker/ui_metin.dart';
 import 'package:drift/drift.dart' show Value;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -51,16 +51,16 @@ void main() {
     await ac(tester, db, _ekran());
 
     final t = today();
-    final bu = '${MetinB.aylar[t.month - 1]} ${t.year}';
+    final bu = '${Metin.aylar[t.month - 1]} ${t.year}';
     expect(find.text(bu), findsOneWidget);
-    expect(find.text(MetinB.bugunDon), findsNothing);
+    expect(find.text(Metin.bugunDon), findsNothing);
 
-    await tester.tap(find.byTooltip(MetinB.oncekiAy));
+    await tester.tap(find.byTooltip(Metin.oncekiAy));
     await tester.pumpAndSettle();
     expect(find.text(bu), findsNothing);
-    expect(find.text(MetinB.bugunDon), findsOneWidget);
+    expect(find.text(Metin.bugunDon), findsOneWidget);
 
-    await tester.tap(find.text(MetinB.bugunDon));
+    await tester.tap(find.text(Metin.bugunDon));
     await tester.pumpAndSettle();
     expect(find.text(bu), findsOneWidget);
 
@@ -77,7 +77,7 @@ void main() {
     await ac(tester, db, _ekran());
 
     final t = today();
-    final gun = '${t.day} ${MetinB.aylar[t.month - 1]}';
+    final gun = '${t.day} ${Metin.aylar[t.month - 1]}';
     expect(find.bySemanticsLabel('Kitap, $gun: işaretlenmedi'), findsOneWidget);
 
     await tester.ensureVisible(_hucre(id, t));
@@ -98,11 +98,11 @@ void main() {
     final db = await bellekDb();
     await habitEkle(db, 'Kitap');
     await ac(tester, db, _ekran());
-    expect(find.text(MetinB.buAyMoodYok), findsOneWidget);
+    expect(find.text(Metin.buAyMoodYok), findsOneWidget);
 
     await db.setMood(formatYmd(today()), 4);
     await tester.pumpAndSettle();
-    expect(find.text(MetinB.buAyMoodYok), findsNothing);
+    expect(find.text(Metin.buAyMoodYok), findsNothing);
     expect(find.bySemanticsLabel(RegExp('Mood grafiği')), findsOneWidget);
 
     await temizle(tester);

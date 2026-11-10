@@ -8,7 +8,7 @@ import '../../data/database/database.dart';
 import '../../data/providers.dart';
 import '../../shared/theme.dart';
 import '../../shared/widgets/habit_avatar.dart';
-import '../settings/ui_metin_b.dart';
+import '../../ui_metin.dart';
 
 /// Statistics: overview cards, per-habit cards (streak, completion, 30-day
 /// trend) and a simple mood ↔ completion correlation view.
@@ -33,20 +33,20 @@ class StatsScreen extends ConsumerWidget {
         Semantics(
           header: true,
           child: Text(
-            MetinB.istatistik,
+            Metin.istatistik,
             style: Theme.of(context).textTheme.headlineSmall
                 ?.copyWith(fontWeight: FontWeight.bold),
           ),
         ),
         const SizedBox(height: 2),
-        Text(MetinB.istatistikAlt, style: TextStyle(color: colors.textDim)),
+        Text(Metin.istatistikAlt, style: TextStyle(color: colors.textDim)),
         const SizedBox(height: 16),
 
         _OverviewCards(overview: overview),
         const SizedBox(height: 20),
 
         if (habits.isNotEmpty) ...[
-          const _SectionTitle(MetinB.alisanliklar),
+          const _SectionTitle(Metin.alisanliklar),
           const SizedBox(height: 8),
           for (final h in habits)
             _HabitStatsCard(
@@ -58,7 +58,7 @@ class StatsScreen extends ConsumerWidget {
           const SizedBox(height: 12),
         ],
 
-        const _SectionTitle(MetinB.moodTamamlama),
+        const _SectionTitle(Metin.moodTamamlama),
         const SizedBox(height: 8),
         _MoodCorrelationCard(
           habits: habits,
@@ -98,24 +98,24 @@ class _OverviewCards extends StatelessWidget {
     final colors = AppColors.of(context);
     final cards = [
       _StatCard(
-        label: MetinB.toplamIsaret,
+        label: Metin.toplamIsaret,
         value: '${overview.totalMarks}',
         color: colors.text,
       ),
       _StatCard(
-        label: MetinB.mevcutSeri,
+        label: Metin.mevcutSeri,
         value: '${overview.bestCurrent}',
-        suffix: MetinB.gun,
+        suffix: Metin.gun,
         color: colors.done,
       ),
       _StatCard(
-        label: MetinB.enUzunSeri,
+        label: Metin.enUzunSeri,
         value: '${overview.bestLongest}',
-        suffix: MetinB.gun,
+        suffix: Metin.gun,
         color: colors.gold,
       ),
       _StatCard(
-        label: MetinB.buAy,
+        label: Metin.buAy,
         value: '${overview.thisMonth}',
         color: colors.text,
       ),
@@ -275,19 +275,19 @@ class _HabitStatsCard extends StatelessWidget {
               children: [
                 _miniStat(
                   colors,
-                  MetinB.mevcutSeri,
-                  '${stats.streak.current} ${MetinB.gun}',
+                  Metin.mevcutSeri,
+                  '${stats.streak.current} ${Metin.gun}',
                   colors.done,
                 ),
                 _miniStat(
                   colors,
-                  MetinB.enUzun,
-                  '${stats.streak.longest} ${MetinB.gun}',
+                  Metin.enUzun,
+                  '${stats.streak.longest} ${Metin.gun}',
                   colors.gold,
                 ),
                 _miniStat(
                   colors,
-                  MetinB.tamamlama,
+                  Metin.tamamlama,
                   '%${(stats.completionRate * 100).round()}',
                   colors.text,
                 ),
@@ -295,7 +295,7 @@ class _HabitStatsCard extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             Text(
-              MetinB.son30Gun,
+              Metin.son30Gun,
               style: TextStyle(fontSize: 12, color: colors.textDim),
             ),
             const SizedBox(height: 6),
@@ -364,7 +364,7 @@ class _TrendStrip extends StatelessWidget {
 
     // The squares carry no individual meaning for TalkBack; read a summary.
     return Semantics(
-      label: MetinB.seritEtiketi(
+      label: Metin.seritEtiketi(
         habit.name,
         done: count(HeatCell.done),
         missed: count(HeatCell.missed),
@@ -445,7 +445,7 @@ class _MoodCorrelationCard extends StatelessWidget {
                 height: 120,
                 child: Center(
                   child: Text(
-                    MetinB.moodYetersiz,
+                    Metin.moodYetersiz,
                     textAlign: TextAlign.center,
                     style: TextStyle(color: colors.textDim, fontSize: 13),
                   ),
@@ -455,7 +455,7 @@ class _MoodCorrelationCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    MetinB.moodAciklama(totalDays),
+                    Metin.moodAciklama(totalDays),
                     style: TextStyle(fontSize: 12, color: colors.textDim),
                   ),
                   const SizedBox(height: 14),
@@ -495,7 +495,7 @@ class _MoodCorrelationCard extends StatelessWidget {
   Widget _moodBar(AppColors colors, Mood mood, double? avgRate, int count) {
     final has = avgRate != null;
     return Semantics(
-      label: MetinB.moodCubuguEtiketi(
+      label: Metin.moodCubuguEtiketi(
         mood.label,
         has ? (avgRate * 100).round() : null,
         count,
@@ -534,7 +534,7 @@ class _MoodCorrelationCard extends StatelessWidget {
           Icon(mood.icon, size: 18, color: colors.textDim),
           const SizedBox(height: 2),
           Text(
-            count > 0 ? '$count ${MetinB.gun}' : '',
+            count > 0 ? '$count ${Metin.gun}' : '',
             style: TextStyle(fontSize: 12, color: colors.textDim),
           ),
         ],

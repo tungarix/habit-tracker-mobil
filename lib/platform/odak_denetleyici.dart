@@ -67,6 +67,8 @@ class AndroidFocusController implements FocusController {
       _sirala(() async {
         await _depo.baslat(s);
         try {
+          // First timer start is the moment the notification permission is asked for.
+          await bildirim.izinIste();
           await bildirim.odakBitisiKur(
             bitis: s.bitis,
             baslik: '${kind.label} bitti',

@@ -1,6 +1,6 @@
 import 'package:aktenak_habit_tracker/core/date_utils.dart';
 import 'package:aktenak_habit_tracker/core/enums.dart';
-import 'package:aktenak_habit_tracker/features/settings/ui_metin_b.dart';
+import 'package:aktenak_habit_tracker/ui_metin.dart';
 import 'package:aktenak_habit_tracker/features/stats/stats_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -25,9 +25,9 @@ void main() {
     }
     await ac(tester, db, const Scaffold(body: StatsScreen()));
 
-    expect(find.text(MetinB.istatistik), findsOneWidget);
+    expect(find.text(Metin.istatistik), findsOneWidget);
     expect(find.text('Kitap'), findsOneWidget);
-    expect(find.text('3 ${MetinB.gun}'), findsWidgets); // current streak
+    expect(find.text('3 ${Metin.gun}'), findsWidgets); // current streak
     expect(
       find.bySemanticsLabel(RegExp('^Kitap, son 30 gün: 3 gün yapıldı')),
       findsOneWidget,

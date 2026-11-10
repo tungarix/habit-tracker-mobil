@@ -4,9 +4,10 @@ import 'package:intl/intl.dart';
 
 import '../../core/constants.dart';
 import '../../data/providers.dart';
+import '../../shared/tema_modu.dart';
 import 'backup_file_service.dart';
 import 'reminder_settings.dart';
-import 'ui_metin_b.dart';
+import '../../ui_metin.dart';
 
 enum _ImportMode { merge, replace }
 
@@ -53,7 +54,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           .read(backupFileServiceProvider)
           .shareBackup(json, repo.suggestedFileName());
     } catch (e) {
-      _toast(MetinB.disaAktarmaHata('$e'));
+      _toast(Metin.disaAktarmaHata('$e'));
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -70,10 +71,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           .read(backupRepositoryProvider)
           .importJson(content, replace: mode == _ImportMode.replace);
       _toast(
-        MetinB.iceAktarildi(r.habits, r.entries, r.moods, r.tasks, r.sessions),
+        Metin.iceAktarildi(r.habits, r.entries, r.moods, r.tasks, r.sessions),
       );
     } catch (e) {
-      _toast(MetinB.iceAktarmaHata('$e'));
+      _toast(Metin.iceAktarmaHata('$e'));
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -83,18 +84,18 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     return showDialog<_ImportMode>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text(MetinB.iceAktarModuBaslik),
+        title: const Text(Metin.iceAktarModuBaslik),
         content: const SingleChildScrollView(
-          child: Text(MetinB.iceAktarModuAciklama),
+          child: Text(Metin.iceAktarModuAciklama),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text(MetinB.iptal),
+            child: const Text(Metin.iptal),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, _ImportMode.merge),
-            child: const Text(MetinB.birlestir),
+            child: const Text(Metin.birlestir),
           ),
           FilledButton(
             style: FilledButton.styleFrom(
@@ -102,7 +103,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               foregroundColor: Theme.of(ctx).colorScheme.onError,
             ),
             onPressed: () => Navigator.pop(ctx, _ImportMode.replace),
-            child: const Text(MetinB.tamamenDegistir),
+            child: const Text(Metin.tamamenDegistir),
           ),
         ],
       ),
@@ -119,24 +120,24 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final text = Theme.of(context).textTheme;
     final dim = Theme.of(context).colorScheme.onSurfaceVariant;
     return Scaffold(
-      appBar: AppBar(title: const Text(MetinB.ayarlarBaslik)),
+      appBar: AppBar(title: const Text(Metin.ayarlarBaslik)),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
           children: [
-            Text(MetinB.veriYalnizBuTelefonda, style: TextStyle(color: dim)),
+            Text(Metin.veriYalnizBuTelefonda, style: TextStyle(color: dim)),
             const SizedBox(height: 16),
             _ActionCard(
               icon: Icons.upload_file,
-              title: MetinB.disaAktar,
-              subtitle: MetinB.disaAktarAciklama,
+              title: Metin.disaAktar,
+              subtitle: Metin.disaAktarAciklama,
               onTap: _busy ? null : _export,
             ),
             const SizedBox(height: 8),
             _ActionCard(
               icon: Icons.download,
-              title: MetinB.iceAktar,
-              subtitle: MetinB.iceAktarAciklama,
+              title: Metin.iceAktar,
+              subtitle: Metin.iceAktarAciklama,
               onTap: _busy ? null : _import,
             ),
             if (_busy) ...[
@@ -146,14 +147,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             const SizedBox(height: 24),
             Semantics(
               header: true,
-              child: Text(MetinB.otomatikYedekBaslik, style: text.titleSmall),
+              child: Text(Metin.otomatikYedekBaslik, style: text.titleSmall),
             ),
             const SizedBox(height: 8),
             const _AutoBackupCard(),
             const SizedBox(height: 24),
             Semantics(
               header: true,
-              child: Text(MetinB.gorunumBaslik, style: text.titleSmall),
+              child: Text(Metin.gorunumBaslik, style: text.titleSmall),
             ),
             const SizedBox(height: 8),
             Card(
@@ -183,13 +184,13 @@ class _ThemeRow extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final mode = ref.watch(themeModeProvider);
+    final mode = ref.watch(temaModuProvider);
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(MetinB.tema),
+          const Text(Metin.tema),
           const SizedBox(height: 8),
           SizedBox(
             width: double.infinity,
@@ -201,20 +202,20 @@ class _ThemeRow extends ConsumerWidget {
               segments: const [
                 ButtonSegment(
                   value: ThemeMode.system,
-                  label: Text(MetinB.temaSistem),
+                  label: Text(Metin.temaSistem),
                 ),
                 ButtonSegment(
                   value: ThemeMode.light,
-                  label: Text(MetinB.temaAcik),
+                  label: Text(Metin.temaAcik),
                 ),
                 ButtonSegment(
                   value: ThemeMode.dark,
-                  label: Text(MetinB.temaKoyu),
+                  label: Text(Metin.temaKoyu),
                 ),
               ],
               selected: {mode},
               onSelectionChanged: (s) =>
-                  ref.read(themeModeProvider.notifier).set(s.first),
+                  ref.read(temaModuProvider.notifier).set(s.first),
             ),
           ),
         ],
@@ -238,7 +239,7 @@ class _DayStartRow extends ConsumerWidget {
         children: [
           Row(
             children: [
-              const Expanded(child: Text(MetinB.gunBaslangici)),
+              const Expanded(child: Text(Metin.gunBaslangici)),
               Text(
                 _hh(hour),
                 style: const TextStyle(fontWeight: FontWeight.w600),
@@ -253,12 +254,12 @@ class _DayStartRow extends ConsumerWidget {
             divisions: 12,
             label: _hh(hour),
             semanticFormatterCallback: (v) =>
-                MetinB.gunBaslangiciSesli(v.round()),
+                Metin.gunBaslangiciSesli(v.round()),
             onChanged: (v) =>
                 ref.read(dayStartHourProvider.notifier).set(v.round()),
           ),
           Text(
-            MetinB.gunBaslangiciAciklama(_hh(hour)),
+            Metin.gunBaslangiciAciklama(_hh(hour)),
             style: TextStyle(
               fontSize: 12,
               color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -288,11 +289,11 @@ class _ReminderRow extends StatelessWidget {
       children: [
         SwitchListTile(
           secondary: const Icon(Icons.notifications_outlined),
-          title: const Text(MetinB.aksamHatirlaticisi),
+          title: const Text(Metin.aksamHatirlaticisi),
           subtitle: Text(
             h == null
-                ? MetinB.hatirlaticiKapali
-                : MetinB.hatirlaticiAcik(_hh(h)),
+                ? Metin.hatirlaticiKapali
+                : Metin.hatirlaticiAcik(_hh(h)),
           ),
           value: h != null,
           onChanged: loaded
@@ -313,7 +314,7 @@ class _ReminderRow extends StatelessWidget {
                     divisions: 6,
                     label: _hh(h),
                     semanticFormatterCallback: (v) =>
-                        MetinB.hatirlaticiSesli(v.round()),
+                        Metin.hatirlaticiSesli(v.round()),
                     onChanged: (v) => onChanged(v.round()),
                   ),
                 ),
@@ -338,15 +339,15 @@ class _AutoBackupCard extends ConsumerWidget {
     final latest = ref.watch(latestAutoBackupProvider).value;
     final scheme = Theme.of(context).colorScheme;
     final status = latest == null
-        ? MetinB.otomatikYedekYok
-        : MetinB.sonYedek(DateFormat('d MMMM y, HH:mm', 'tr').format(latest));
+        ? Metin.otomatikYedekYok
+        : Metin.sonYedek(DateFormat('d MMMM y, HH:mm', 'tr').format(latest));
     return Card(
       child: Column(
         children: [
           ListTile(
             leading: const Icon(Icons.history),
-            title: const Text(MetinB.otomatikYedek),
-            subtitle: Text('${MetinB.otomatikYedekAciklama} $status'),
+            title: const Text(Metin.otomatikYedek),
+            subtitle: Text('${Metin.otomatikYedekAciklama} $status'),
           ),
           Container(
             margin: const EdgeInsets.fromLTRB(12, 0, 12, 12),
@@ -365,7 +366,7 @@ class _AutoBackupCard extends ConsumerWidget {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    MetinB.yedekUyari,
+                    Metin.yedekUyari,
                     style: TextStyle(color: scheme.onErrorContainer),
                   ),
                 ),

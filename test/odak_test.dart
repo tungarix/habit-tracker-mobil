@@ -23,6 +23,9 @@ class SahteBildirim implements BildirimKapisi {
 
   @override
   Future<void> odakBitisiIptal() async => iptal++;
+
+  @override
+  Future<void> izinIste() async {}
 }
 
 void main() {

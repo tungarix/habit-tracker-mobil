@@ -3,7 +3,21 @@
 Aktenak Habit Tracker'ın Android sürümü: hesapsız, internetsiz, verin telefonunda kalır.
 Masaüstü sürümü: [tungarix/habit-tracker](https://github.com/tungarix/habit-tracker).
 
-> Durum: **iskelet (v0.0.1, geliştirme)**. Henüz kullanılabilir ekran yok; plan için [PLAN.md](PLAN.md).
+> Durum: **ilk sürüm öncesi (v0.0.1, geliştirme)**. Henüz yayımlanmadı, telefonda denenmedi; plan için [PLAN.md](PLAN.md).
+
+## Özellikler
+
+- **Bugün:** bugünün alışkanlık listesi. Dokundukça ✓ → ✗ → – → boş döner; sayılı alışkanlıkta uzun basınca miktar girilir. Mood, kısa not, açılıp kapanan 30 günlük ısı şeridi, bu haftanın görevleri.
+- **Görevler:** aciliyete göre gruplu liste, ekle / düzenle / bitir.
+- **Aylık:** alışkanlık x gün tablosu (44 px hücre, yatay kayar, adlar sabit sütunda) ve mood grafiği.
+- **İstatistik:** seriler, tamamlama oranları, 30 gün şeridi, mood ile tamamlama ilişkisi.
+- **Alışkanlıklar ve Ayarlar** (Bugün ekranının menüsünden): ekle, düzenle, arşivle, sırala, sil; tema (Sistem / Açık / Koyu); gün başlangıç saati; JSON yedeği dışa / içe aktarma (masaüstü yedekleri dahil).
+- **Odak sayacı:** ekran kapalıyken de zamanında biter, süreç ölse de kaldığı yerden sürer; bitiş bildirimi tam zamanlıdır.
+- **Akşam hatırlatıcısı:** önümüzdeki 7 gün için bildirim; bugünün alışkanlıkları tamamsa bugünkü gelmez.
+- **Ana ekran widget'ı:** bugünün alışkanlıkları, dokununca ✓ yazar.
+- **Otomatik yedek:** açılışta ve uygulama öne gelince günde bir; uygulamanın kendi klasöründe kalır (telefon dışına çıkmaz, uygulama kaldırılınca silinir).
+- Erişilebilirlik: durum işaretleri TalkBack'te okunur, dokunma alanları en az 48 dp.
+- Hesap ve bulut yok. İnternet yalnız güncelleme denetimi için (uygulama içi güncelleme arayüzü henüz bağlanmadı).
 
 ## Kurulum
 
@@ -12,9 +26,16 @@ _Yer tutucu: ilk imzalı sürüm yayımlanınca indirme bağlantısı buraya gel
 APK yalnız GitHub Release ve aktenak.tech üzerinden dağıtılır (Play Store yok).
 Telefonda "bilinmeyen kaynaklardan yükleme" izni gerekir.
 
+Kurulum notları:
+- Bildirim izni, ilk hatırlatıcı ya da sayaç açılışında istenir. Android 12'de tam zamanlı alarm izni de gerekir.
+- Pil tasarrufu bildirimleri geciktirebilir; hatırlatıcı yaklaşık zamanlıdır (birkaç dakika kayabilir).
+- Uygulamayı kaldırmak veriyi siler (`allowBackup=false`); önce Ayarlar'dan dışa aktar.
+- Sonraki sürümler veri kaybı olmadan üstüne kurulur.
+
 ## Doğrulama
 
-_Yer tutucu: sertifika SHA-256 parmak izi ve `SHA256SUMS.txt` ile APK doğrulama adımları ilk imzalı sürümle yazılacak._
+Sertifika SHA-256 parmak izi: _ilk sürümde yazılacak_.
+`SHA256SUMS.txt` ile APK doğrulama adımları da ilk imzalı sürümle yazılacak.
 
 ## Geliştirme
 
@@ -26,6 +47,7 @@ pwsh tool/test_calistir.ps1    # testleri dosya dosya çalıştırır (Windows't
 
 - Ortak kod masaüstünden kopyalanır: `pwsh tool/esitle.ps1`. Kopyalar elle değiştirilmez;
   `test/uyum_test.dart` ve CI uyum bekçisi bunu denetler. Bilinçli sapmalar `tool/kaynak_ozet.json` içinde gerekçesiyle durur.
+- Yerel yayın derlemesi (NDK'sız makinede): `HABIT_YEREL_NDKSIZ=1 flutter build apk --release --target-platform android-arm64`. APK büyük çıkar (~170 MB, yalnız derleme denemesi içindir).
 - Yerel debug APK telefona kurulmaz (imzası yayın sürümünden farklı). Yayın APK'sı yalnız CI'dan çıkar.
 
 ## Lisans
