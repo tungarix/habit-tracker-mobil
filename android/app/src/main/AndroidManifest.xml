@@ -4,6 +4,10 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <!-- Tell Wi-Fi from mobile data (default: download on Wi-Fi only). -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <!-- QR pairing with the desktop app: asked at runtime, only when the user taps "QR'ı tara". No image is
+         stored or sent. Cameraless devices can still install (uses-feature below) and use "paste the link". -->
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-feature android:name="android.hardware.camera" android:required="false"/>
     <!-- Install the downloaded, verified APK through the system install dialog. -->
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
     <!-- Android 13+: runtime permission for the evening reminder and the focus-timer notification. -->

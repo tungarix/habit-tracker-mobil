@@ -2,6 +2,7 @@
 //  - agTuru: active network kind ('wifi' | 'mobil' | 'yok'),
 //  - kurulumIzniVar / kurulumIzniAc: "install unknown apps" permission,
 //  - apkKur: installs a verified APK through PackageInstaller,
+//  - uygulamaAyarlariniAc: this app's system settings page,
 //  - kurulumSonucu (Kotlin -> Dart): install session result,
 //  - bekleyenDosya / dosyaGeldi: a .habitsync opened from outside the app ("Open with" / Share).
 import 'package:flutter/services.dart';
@@ -32,6 +33,9 @@ abstract class Kopru {
   /// same package name and a higher versionCode, and only if its SHA-256 equals [ozet]; otherwise throws a `PlatformException`.
   /// Success = the system install dialog opened.
   Future<void> apkKur(String yol, String ozet);
+
+  /// Opens this app's system settings page (to re-grant a denied camera permission).
+  Future<void> uygulamaAyarlariniAc();
 
   /// PackageInstaller result (status code + message); 0 = success.
   void kurulumSonucuDinle(void Function(int durum, String? mesaj) f);
@@ -75,6 +79,10 @@ class AndroidKopru implements Kopru {
 
   @override
   Future<void> kurulumIzniAc() => _kanal.invokeMethod<void>('kurulumIzniAc');
+
+  @override
+  Future<void> uygulamaAyarlariniAc() =>
+      _kanal.invokeMethod<void>('uygulamaAyarlariniAc');
 
   @override
   Future<void> apkKur(String yol, String ozet) =>

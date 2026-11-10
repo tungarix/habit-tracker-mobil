@@ -12,6 +12,7 @@ import 'guncelleme_bolumu.dart';
 import 'reminder_settings.dart';
 import 'senkron_akisi.dart';
 import 'senkron_dosya_servisi.dart';
+import 'wifi_eslestir_ekrani.dart';
 import '../../ui_metin.dart';
 
 enum _ImportMode { merge, replace }
@@ -185,6 +186,19 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             Semantics(
               header: true,
               child: Text(Metin.senkronBaslik, style: text.titleSmall),
+            ),
+            const SizedBox(height: 8),
+            _ActionCard(
+              icon: Icons.qr_code_scanner,
+              title: Metin.wifiGiris,
+              subtitle: Metin.wifiGirisAciklama,
+              onTap: _busy
+                  ? null
+                  : () => Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        builder: (_) => const WifiEslestirEkrani(),
+                      ),
+                    ),
             ),
             const SizedBox(height: 8),
             _ActionCard(

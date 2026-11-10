@@ -90,6 +90,8 @@ class _SahteKopru implements Kopru {
   @override
   Future<void> kurulumIzniAc() async => izinAcildi++;
   @override
+  Future<void> uygulamaAyarlariniAc() async {}
+  @override
   Future<void> apkKur(String yol, String ozet) async =>
       kurulan.add((yol, ozet));
   @override

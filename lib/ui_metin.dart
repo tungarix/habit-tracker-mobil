@@ -366,6 +366,116 @@ abstract final class Metin {
   static const senkronIceAktarDugme = 'İçe aktar';
   static String senkronGecersiz(String e) => '$e Hiçbir şey değişmedi.';
 
+  // Bilgisayarla eşitle (QR + Wi-Fi)
+  static const wifiGiris = 'Bilgisayarla eşitle';
+  static const wifiGirisAciklama =
+      'Aynı Wi-Fi\'daki bilgisayarla QR kodu okutarak iki yönlü eşitle.';
+  static const wifiBaslik = 'Bilgisayarla eşitle';
+  static const wifiAnlatim =
+      'Bilgisayarda Habit Tracker\'ı aç, "Telefonla eşleştir (Wi-Fi)" de. '
+      'Çıkan QR kodu burada okut. İkisi de aynı Wi-Fi\'da olmalı.\n\n'
+      'Kamera yalnız QR kodu okumak için açılır; görüntü kaydedilmez ve hiçbir yere gönderilmez.';
+  static const wifiQrTara = 'QR\'ı tara';
+  static const wifiBaglantiYapistir = 'Bağlantıyı yapıştır';
+  static const wifiBaglantiAlani = 'Eşleştirme bağlantısı';
+  static const wifiBaglantiIpucu = 'habitsync://p?...';
+  static const wifiBaglantiTamam = 'Devam';
+  static const wifiTarayiciEtiket =
+      'Kamera önizlemesi, bilgisayardaki QR kodu çerçeveye getir';
+  static const wifiTaramaYonerge = 'Bilgisayardaki QR kodu çerçeveye getir.';
+  static const wifiIzinBaslik = 'Kamera izni verilmedi';
+  static const wifiIzinAciklama =
+      'QR kodu okumak için kamera gerekir. Kamera yalnız bu iş için açılır. '
+      'İstersen izni uygulama ayarlarından ver ya da bağlantıyı elle yapıştır.';
+  static const wifiKameraAcilamadi =
+      'Kamera açılamadı. Bağlantıyı elle yapıştırabilirsin.';
+  static const wifiYenidenDene = 'Yeniden dene';
+  static const wifiAyarlariAc = 'Uygulama ayarlarını aç';
+  static const wifiOnay1Baslik = 'Bu bilgisayara bağlanılsın mı?';
+  static String wifiOnay1(
+    String ad,
+    List<String> adresler,
+    bool suresiDolmus,
+  ) =>
+      '${ad.isEmpty ? 'Bilinmeyen bilgisayar' : '«$ad»'} · ${adresler.join(', ')}\n\n'
+      'Bu, şu an ekranına baktığın bilgisayar mı? Bağlanınca bilgisayar da senden onay isteyecek.'
+      '${suresiDolmus ? '\n\nQR\'ın süresi dolmuş olabilir.' : ''}';
+  static const wifiBaglan = 'Bağlan';
+  static const wifiBaglaniyor =
+      'Bilgisayara bağlanılıyor. Bilgisayarda "evet" demen gerekebilir.';
+  static const wifiVeriAliniyor =
+      'Bilgisayarın verisi alınıyor ve kontrol ediliyor.';
+  static const wifiUygulaniyor =
+      'Birleştiriliyor ve bilgisayara gönderiliyor. Lütfen bekle.';
+  static const wifiOzetBaslik = 'Bilgisayardan gelecekler';
+  static const wifiEklenecek = 'Eklenecek';
+  static const wifiGuncellenecek = 'Güncellenecek';
+  static const wifiSilinecek = 'Silinecek';
+  static const wifiDegisiklikYok =
+      'Bilgisayardan gelecek değişiklik yok. Telefondaki veri bilgisayara gönderilecek.';
+  static const wifiGonderSonra =
+      'Birleştirilince telefondaki tüm veri bilgisayara gönderilir; bilgisayar da senden ayrıca onay ister. '
+      'Birleştirmeden önce telefondaki verinin yedeği alınır.';
+  static const wifiSilmeUyari =
+      'Dikkat: bazı kayıtlar silinecek (bir alışkanlık silinirse işaretleri de gider).';
+  static const wifiCokSilme =
+      'Bu eşleştirmede çok kayıt silinecek; yedek alınıp öyle uygulanır. Emin değilsen Vazgeç.';
+  static const wifiBirlestirGonder = 'Birleştir ve gönder';
+  static const wifiGonder = 'Gönder';
+  static const wifiVazgec = 'Vazgeç';
+  static String wifiTur(String tur, int n) => switch (tur) {
+    'habit' => '$n alışkanlık',
+    'entry' => '$n işaret',
+    'mood' => '$n ruh hali',
+    'task' => '$n görev',
+    'session' => '$n odak seansı',
+    _ => '$n kayıt',
+  };
+  static const wifiBitti = 'Eşitleme tamamlandı';
+  static String wifiTelefonSonuc(int e, int g, int s) =>
+      'Telefon: $e eklendi, $g güncellendi, $s silindi.';
+  static String wifiBilgisayarSonuc(int e, int g, int s) =>
+      'Bilgisayar: $e eklendi, $g güncellendi, $s silindi.';
+  static const wifiYarimBaslik = 'Yarım kaldı';
+  static const wifiYarimTelefon =
+      'Telefon güncellendi, ama bilgisayar değişmedi.';
+  static const wifiTamam = 'Tamam';
+  static const wifiHataBaslik = 'Eşitlenemedi';
+  static const wifiIptalEkran = 'Ekran kapandığı için eşleştirme iptal edildi.';
+  static const wifiVazgecildi = 'Vazgeçildi. Hiçbir şey değişmedi.';
+  static String wifiHata(String kod) => switch (kod) {
+    'istek_bozuk' => 'Bilgisayarla anlaşılamadı. İki uygulamayı da güncelle.',
+    'protokol_surumu' => 'Uygulama sürümleri uyumsuz. Telefondaki ve bilgisayardaki uygulamayı güncelle.',
+    'senkron_bozuk' => 'Dosya geçersiz; hiçbir şey değişmedi.',
+    'senkron_bozuk_yerel' =>
+      'Bilgisayarın verisi geçersiz; hiçbir şey değişmedi.',
+    'senkron_surumu' => 'Dosya daha yeni bir sürümden. Uygulamayı güncelle.',
+    'yetkisiz' => 'Bağlantı geçersiz ya da kullanılmış. Bilgisayarda yeniden "Telefonla eşleştir"e bas.',
+    'reddedildi' => 'Bilgisayar eşleştirmeyi reddetti.',
+    'sure_doldu' => 'Süre doldu.',
+    'mesgul' || 'cok_istek' => 'Bilgisayar meşgul, biraz sonra dene.',
+    'iptal' => 'Bilgisayarda eşleştirme iptal edildi.',
+    'cok_buyuk' => 'Veri çok büyük; dosya ile senkronu dene.',
+    'qr_gecersiz' => 'Bu QR kod Habit Tracker eşleştirmesine ait değil.',
+    'adres_izinsiz' =>
+      'Bu bağlantı özel bir ağ adresi değil; güvenlik için bağlanılmadı.',
+    'wifi_degil' =>
+      'Önce Wi-Fi\'a bağlan; mobil veriyle bilgisayara ulaşılamaz.',
+    'ag_ulasilamiyor' =>
+      'Bilgisayara ulaşılamadı. İkisi de aynı Wi-Fi\'da mı? Misafir ağlar cihazları birbirinden '
+          'ayırabilir. Windows Güvenlik Duvarı\'nda "Özel ağlar" iznini de kontrol et.',
+    'parmak_izi_uyusmadi' => 'Güvenlik uyarısı: bağlanılan cihaz QR\'daki cihaz değil. Bağlantı kesildi, hiçbir veri gönderilmedi.',
+    'zaman_asimi' => 'Süre doldu; bilgisayardan yanıt gelmedi.',
+    'yanit_bozuk' =>
+      'Bilgisayarın yanıtı anlaşılamadı. İki uygulamayı da güncelle.',
+    'kamera_izni' => 'Kamera izni verilmedi.',
+    'yedek_alinamadi' =>
+      'Yedek alınamadı, bu yüzden birleştirilmedi. Hiçbir şey değişmedi.',
+    _ =>
+      'Beklenmeyen bir sorun oldu. Hiçbir şey değişmemiş olabilir; kontrol et.',
+  };
+
+
   static const otomatikYedekBaslik = 'Otomatik yedek';
   static const otomatikYedek = 'Günlük yedek';
   static const otomatikYedekAciklama =

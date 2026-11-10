@@ -21,6 +21,7 @@ import java.io.File
  *  - apkKur: installs an APK from the app cache dir through a PackageInstaller session. Only an APK
  *    with this package name and a higher versionCode is accepted; the final word is Android's
  *    signature check (an APK signed with another key cannot be installed over this one).
+ *  - uygulamaAyarlariniAc: this app's system settings page (re-grant the camera permission for QR pairing),
  *  - kurulumSonucu (Kotlin -> Dart): session result.
  *  - bekleyenDosya / dosyaGeldi: a .habitsync opened with "Open with" / Share. Only content:// is read, at most
  *    16 MB; the bytes go to Dart, which validates and asks the user before anything is merged.
@@ -66,6 +67,13 @@ class MainActivity : FlutterActivity() {
                     "kurulumIzniAc" -> {
                         startActivity(
                             Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:$packageName"))
+                                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        )
+                        sonuc.success(null)
+                    }
+                    "uygulamaAyarlariniAc" -> {
+                        startActivity(
+                            Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:$packageName"))
                                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                         )
                         sonuc.success(null)
