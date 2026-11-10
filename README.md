@@ -55,3 +55,19 @@ pwsh tool/test_calistir.ps1    # testleri dosya dosya çalıştırır (Windows't
 ## Lisans
 
 [MIT](LICENSE)
+
+## Ekran görüntüleri
+
+Emülatörde, uydurma verilerle alındı (`docs/gece-raporu/ekran/`).
+
+| Bugün | Aylık | İstatistik |
+|---|---|---|
+| ![Bugün](docs/gece-raporu/ekran/bugun.png) | ![Aylık](docs/gece-raporu/ekran/aylik.png) | ![İstatistik](docs/gece-raporu/ekran/istatistik.png) |
+
+| Görevler | Ayarlar | Güncelleme |
+|---|---|---|
+| ![Görevler](docs/gece-raporu/ekran/gorevler.png) | ![Ayarlar](docs/gece-raporu/ekran/ayarlar.png) | ![Güncelleme](docs/gece-raporu/ekran/ayarlar-guncelleme.png) |
+
+| Bilgisayarla senkron | Senkron onayı |
+|---|---|
+| ![Senkron](docs/gece-raporu/ekran/senkron.png) | ![Onay](docs/gece-raporu/ekran/senkron-onay.png) |

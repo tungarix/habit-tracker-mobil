@@ -34,7 +34,7 @@ class _MonthlyScreenState extends ConsumerState<MonthlyScreen> {
   static const double _labelW = 120;
   static const double _cellW = 44;
   static const double _rowH = 44;
-  static const double _headerH = 48;
+  static const double _headerH = 56;
   static const double _moodH = 120;
 
   late DateTime _month;
@@ -70,48 +70,53 @@ class _MonthlyScreenState extends ConsumerState<MonthlyScreen> {
       children: [
         _monthHeader(isCurrentMonth),
         Expanded(
-          child: SingleChildScrollView(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _labelColumn(colors, habits),
-                Expanded(
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: SizedBox(
-                      width: days * _cellW,
-                      child: Column(
-                        children: [
-                          RepaintBoundary(
-                            child: _dayHeaderRow(colors, days, t),
-                          ),
-                          for (final h in habits)
+          // The grid has fixed cell/row heights, so cap the system font scale here only (at 200% the
+          // weekday letters and 2-line habit names overflowed); the rest of the app still scales fully.
+          child: MediaQuery.withClampedTextScaling(
+            maxScaleFactor: 1.3,
+            child: SingleChildScrollView(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _labelColumn(colors, habits),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: SizedBox(
+                        width: days * _cellW,
+                        child: Column(
+                          children: [
                             RepaintBoundary(
-                              child: _HabitRow(
-                                habit: h,
+                              child: _dayHeaderRow(colors, days, t),
+                            ),
+                            for (final h in habits)
+                              RepaintBoundary(
+                                child: _HabitRow(
+                                  habit: h,
+                                  month: _month,
+                                  days: days,
+                                  todayDate: t,
+                                  cellW: _cellW,
+                                  rowH: _rowH,
+                                ),
+                              ),
+                            const SizedBox(height: 8),
+                            RepaintBoundary(
+                              child: _MoodLine(
                                 month: _month,
                                 days: days,
-                                todayDate: t,
                                 cellW: _cellW,
-                                rowH: _rowH,
+                                height: _moodH,
+                                todayIndex: isCurrentMonth ? t.day - 1 : null,
                               ),
                             ),
-                          const SizedBox(height: 8),
-                          RepaintBoundary(
-                            child: _MoodLine(
-                              month: _month,
-                              days: days,
-                              cellW: _cellW,
-                              height: _moodH,
-                              todayIndex: isCurrentMonth ? t.day - 1 : null,
-                            ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

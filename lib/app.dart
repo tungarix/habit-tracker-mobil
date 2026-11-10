@@ -97,8 +97,9 @@ class _KabukState extends ConsumerState<Kabuk> {
             onGorevler: () => setState(() => _index = 1),
           ),
           const TasksScreen(),
-          const MonthlyScreen(),
-          const StatsScreen(),
+          // These two have no AppBar, so keep their titles out of the status bar.
+          const SafeArea(bottom: false, child: MonthlyScreen()),
+          const SafeArea(bottom: false, child: StatsScreen()),
         ],
       ),
       bottomNavigationBar: NavigationBar(
