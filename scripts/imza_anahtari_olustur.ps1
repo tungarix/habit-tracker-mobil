@@ -58,7 +58,7 @@ $ErrorActionPreference = 'Continue'
     -dname 'CN=Aktenak Habit Tracker, O=Aktenak, C=TR' 2>$null | Out-Null
 if ($LASTEXITCODE -ne 0) { throw 'keytool anahtarı oluşturamadı.' }
 
-# DPAPI: yalnız bu Windows kullanıcısı çözebilir; düz metin değildir.
+# DÜZ METİN: şifre anahtarla aynı klasörde (bilinçli karar). Klasörü kopyalayan herkes imzalayabilir.
 [IO.File]::WriteAllText($sifreDosyasi, $sifre)
 @"
 Habit Tracker (Android) sürüm imza anahtarı ($(Get-Date -Format yyyy-MM-dd))
