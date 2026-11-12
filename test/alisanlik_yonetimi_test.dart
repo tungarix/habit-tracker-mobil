@@ -45,6 +45,26 @@ void main() {
     await temizle(tester);
   });
 
+  testWidgets('double tap on Kaydet creates one habit', (tester) async {
+    telefon(tester, height: 1200);
+    final db = await bellekDb();
+    await ac(tester, db, const HabitsScreen());
+
+    await tester.tap(find.text(Metin.alisanlikFab));
+    await tester.pumpAndSettle();
+    await tester.enterText(_diyalogAlanlari().first, 'Su');
+    // Two taps before the first write finishes: call the handler back to back.
+    final onPressed = tester.widget<FilledButton>(find.widgetWithText(FilledButton, Metin.kaydet)).onPressed!;
+    onPressed();
+    onPressed();
+    await tester.pumpAndSettle();
+
+    expect(await db.getAllHabits(), hasLength(1));
+    expect(find.byType(HabitsScreen), findsOneWidget);
+
+    await temizle(tester);
+  });
+
   testWidgets('empty name is not saved', (tester) async {
     telefon(tester, height: 1200);
     final db = await bellekDb();

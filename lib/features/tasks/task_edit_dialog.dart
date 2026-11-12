@@ -53,9 +53,23 @@ class _TaskEditDialogState extends ConsumerState<TaskEditDialog> {
     super.dispose();
   }
 
+  bool _mesgul = false;
+
   Future<void> _save() async {
     final title = _title.text.trim();
-    if (title.isEmpty) return;
+    // A second tap while the write is pending would create a duplicate and pop twice.
+    if (title.isEmpty || _mesgul) return;
+    _mesgul = true;
+    try {
+      await _yaz(title);
+    } catch (_) {
+      _mesgul = false;
+      rethrow;
+    }
+    if (mounted) Navigator.of(context).pop();
+  }
+
+  Future<void> _yaz(String title) async {
     final repo = ref.read(taskRepositoryProvider);
     final dueStr = _dueDay == null ? null : formatYmd(_dueDay!);
 
@@ -79,15 +93,17 @@ class _TaskEditDialogState extends ConsumerState<TaskEditDialog> {
     } else {
       await repo.create(title: title, priority: _priority, dueDay: dueStr);
     }
-    if (mounted) Navigator.of(context).pop();
   }
 
   Future<void> _pickDate() async {
     final today = ref.read(todayProvider);
+    final due = _dueDay;
+    final oldest = DateTime(today.year - 1);
     final picked = await showDatePicker(
       context: context,
-      initialDate: _dueDay ?? today,
-      firstDate: DateTime(today.year - 1),
+      initialDate: due ?? today,
+      // An overdue task older than the window must still open the picker.
+      firstDate: due != null && due.isBefore(oldest) ? due : oldest,
       lastDate: DateTime(today.year + 3),
       locale: const Locale('tr'),
     );
@@ -214,9 +230,16 @@ class _TaskEditDialogState extends ConsumerState<TaskEditDialog> {
         if (_isEdit)
           TextButton(
             onPressed: () async {
-              await ref
-                  .read(taskRepositoryProvider)
-                  .delete(widget.existing!.id);
+              if (_mesgul) return;
+              _mesgul = true;
+              try {
+                await ref
+                    .read(taskRepositoryProvider)
+                    .delete(widget.existing!.id);
+              } catch (_) {
+                _mesgul = false;
+                rethrow;
+              }
               if (context.mounted) Navigator.of(context).pop();
             },
             child: Text(Metin.sil, style: TextStyle(color: colors.missed)),

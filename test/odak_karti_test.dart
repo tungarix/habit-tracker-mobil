@@ -2,6 +2,10 @@ import 'package:aktenak_habit_tracker/core/enums.dart';
 import 'package:aktenak_habit_tracker/features/today/focus_controller.dart';
 import 'package:aktenak_habit_tracker/ui_metin.dart';
 import 'package:flutter/foundation.dart';
+import 'package:aktenak_habit_tracker/data/providers.dart';
+import 'package:aktenak_habit_tracker/features/today/widgets/focus_card.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'ui_yardimci.dart';
@@ -108,7 +112,39 @@ void main() {
     expect(find.text(Metin.bitir), findsNothing);
     await temizle(tester);
   });
+
+  testWidgets('Odak kartı: seçilen süre kart ekran dışına kayıp dönünce korunur', (
+    tester,
+  ) async {
+    telefonBoyutu(tester);
+    final db = await bellekDb();
+    final sahte = _SahteOdak();
+    // Bugün ekranındaki gibi ListView(children:): kart ekran dışında ağaçtan çıkabilir.
+    await tester.pumpWidget(
+      ProviderScope(
+        // ignore: argument_type_not_assignable
+        overrides: [databaseProvider.overrideWithValue(db), focusControllerProvider.overrideWithValue(sahte)],
+        child: MaterialApp(
+          home: Scaffold(
+            body: ListView(children: const [FocusCard(), SizedBox(height: 4000)]),
+          ),
+        ),
+      ),
+    );
+    await bekle(tester);
+
+    await tester.tap(find.text(Metin.dakika(45)));
+    await bekle(tester, 2);
+    // Sıçrama (ink) animasyonu bitsin: sürerken InkWell kartı canlı tutar.
+    await bekle(tester, 12);
+    final liste = find.byType(Scrollable).first;
+    await tester.drag(liste, const Offset(0, -3000));
+    await bekle(tester, 2);
+    await tester.drag(liste, const Offset(0, 3000));
+    await bekle(tester, 2);
+    await tester.tap(find.text(Metin.baslat(SessionKind.focus.label)));
+    await bekle(tester, 2);
+    expect(sahte.baslatilan, [45]);
+    await temizle(tester);
+  });
 }
-
-
-

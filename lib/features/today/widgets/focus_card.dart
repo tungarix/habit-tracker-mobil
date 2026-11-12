@@ -19,8 +19,12 @@ class FocusCard extends ConsumerStatefulWidget {
   ConsumerState<FocusCard> createState() => _FocusCardState();
 }
 
-class _FocusCardState extends ConsumerState<FocusCard> {
+class _FocusCardState extends ConsumerState<FocusCard> with AutomaticKeepAliveClientMixin {
   static const _presets = <int>[25, 45, 15]; // minutes
+
+  // Scrolled off screen in the Bugün list: keep the chosen length and the results subscription.
+  @override
+  bool get wantKeepAlive => true;
 
   int _planned = 25;
   StreamSubscription<FocusResult>? _sub;
@@ -60,6 +64,7 @@ class _FocusCardState extends ConsumerState<FocusCard> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final colors = AppColors.of(context);
     final controller = ref.watch(focusControllerProvider);
     final summary = ref.watch(focusSummaryProvider);

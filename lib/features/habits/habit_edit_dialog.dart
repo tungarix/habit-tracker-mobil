@@ -74,9 +74,23 @@ class _HabitEditDialogState extends ConsumerState<HabitEditDialog> {
     return parsed > syncMaxCount ? syncMaxCount : parsed;
   }
 
+  bool _kaydediliyor = false;
+
   Future<void> _save() async {
     final name = _name.text.trim();
-    if (name.isEmpty) return;
+    // A second tap while the write is pending would create a duplicate and pop twice.
+    if (name.isEmpty || _kaydediliyor) return;
+    _kaydediliyor = true;
+    try {
+      await _yaz(name);
+    } catch (_) {
+      _kaydediliyor = false;
+      rethrow;
+    }
+    if (mounted) Navigator.of(context).pop();
+  }
+
+  Future<void> _yaz(String name) async {
     final repo = ref.read(habitRepositoryProvider);
     final desc = _desc.text.trim().isEmpty ? null : _desc.text.trim();
     final weekdays = weekdaysToString(_weekdays);
@@ -106,7 +120,6 @@ class _HabitEditDialogState extends ConsumerState<HabitEditDialog> {
         scheduledWeekdays: weekdays,
       );
     }
-    if (mounted) Navigator.of(context).pop();
   }
 
   @override
