@@ -8,6 +8,7 @@ import '../../core/enums.dart';
 import '../../data/database/database.dart';
 import '../../data/providers.dart';
 import '../../data/sync/sync_format.dart' show syncMaxTaskTitle;
+import '../../shared/onay.dart';
 import '../../shared/theme.dart';
 import '../../ui_metin.dart';
 
@@ -231,6 +232,12 @@ class _TaskEditDialogState extends ConsumerState<TaskEditDialog> {
           TextButton(
             onPressed: () async {
               if (_mesgul) return;
+              final ok = await onayIste(
+                context,
+                Metin.gorevSilBaslik,
+                Metin.gorevSilGovde,
+              );
+              if (!ok || !context.mounted) return;
               _mesgul = true;
               try {
                 await ref

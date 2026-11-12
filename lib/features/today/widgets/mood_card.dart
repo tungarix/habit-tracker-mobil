@@ -5,6 +5,7 @@ import '../../../core/date_utils.dart';
 import '../../../core/enums.dart';
 import '../../../data/database/database.dart';
 import '../../../data/providers.dart';
+import '../../../shared/onay.dart';
 import '../../../shared/theme.dart';
 import '../../../ui_metin.dart';
 
@@ -58,12 +59,23 @@ class MoodCard extends ConsumerWidget {
             ),
             MoodPicker(
               selected: selected,
-              onTap: (mood) {
+              onTap: (mood) async {
                 final repo = ref.read(habitRepositoryProvider);
                 final dateStr = formatYmd(day);
-                mood == selected
-                    ? repo.clearMood(dateStr)
-                    : repo.setMood(dateStr, mood.value);
+                if (mood != selected) {
+                  repo.setMood(dateStr, mood.value);
+                  return;
+                }
+                // Aynı ruh haline tekrar dokunmak kaydı ve günün notunu siler: not varsa sor.
+                if (entry?.note?.isNotEmpty ?? false) {
+                  final ok = await onayIste(
+                    context,
+                    Metin.moodSilBaslik,
+                    Metin.moodSilGovde,
+                  );
+                  if (!ok) return;
+                }
+                repo.clearMood(dateStr);
               },
             ),
             if (entry?.note?.isNotEmpty ?? false) ...[

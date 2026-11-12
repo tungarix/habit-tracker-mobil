@@ -71,6 +71,8 @@ abstract final class Metin {
   static const moodSoru = 'Bugün nasılsın?';
   static const notTooltip = 'Not';
   static const notBaslik = 'Bugüne kısa not';
+  static const moodSilBaslik = 'Ruh hali silinsin mi?';
+  static const moodSilGovde = 'Bugünün notu da silinir. Bu geri alınamaz.';
   static const notIpucu = 'Örn. yoğun bir gündü';
   static const moodYok =
       'Mood kaydı yok. Bugünü işaretle, çizgi buradan başlasın.';
@@ -108,6 +110,8 @@ abstract final class Metin {
   static const temizleBaslik = 'Biten görevler silinsin mi?';
   static const temizleGovde =
       'Tamamlanmış tüm görevler kalıcı olarak silinir. Bu geri alınamaz.';
+  static const gorevSilBaslik = 'Görev silinsin mi?';
+  static const gorevSilGovde = 'Görev kalıcı olarak silinir. Bu geri alınamaz.';
   static const yeniGorev = 'Yeni görev';
   static const gorevDuzenle = 'Görevi düzenle';
   static const baslik = 'Başlık';

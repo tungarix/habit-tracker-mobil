@@ -106,6 +106,33 @@ void main() {
     await temizle(tester);
   });
 
+  testWidgets('Bugün: notu olan ruh haline tekrar dokunmak onay ister', (tester) async {
+    telefonBoyutu(tester, yukseklik: 2400);
+    final db = await bellekDb();
+    await uygulamaAc(tester, db);
+
+    final mutlu = find.byIcon(Mood.mutlu.icon);
+    await tester.ensureVisible(mutlu);
+    await tester.tap(mutlu);
+    await bekle(tester);
+    await tester.runAsync(() => db.setMoodNote(formatYmd(DateTime.now()), 'iyi gündü'));
+    await bekle(tester);
+
+    await tester.tap(mutlu);
+    await bekle(tester);
+    expect(find.text(Metin.moodSilBaslik), findsOneWidget);
+    await tester.tap(find.text(Metin.iptal));
+    await bekle(tester);
+    expect((await tester.runAsync(() => db.watchAllMoods().first))!.single.note, 'iyi gündü');
+
+    await tester.tap(mutlu);
+    await bekle(tester);
+    await tester.tap(find.descendant(of: find.byType(AlertDialog), matching: find.text(Metin.sil)));
+    await bekle(tester);
+    expect(await tester.runAsync(() => db.watchAllMoods().first), isEmpty);
+    await temizle(tester);
+  });
+
   testWidgets('Bugün: ruh hali notu kaydedilir, pencere kapanırken hata atmaz', (tester) async {
     telefonBoyutu(tester, yukseklik: 2400);
     final db = await bellekDb();
