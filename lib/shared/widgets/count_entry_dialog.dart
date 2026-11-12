@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../data/database/database.dart';
+import '../../data/sync/sync_format.dart' show syncMaxCount;
 import '../../ui_metin.dart';
 import '../theme.dart';
 
@@ -38,7 +39,9 @@ class _CountEntryDialogState extends State<CountEntryDialog> {
     text: widget.current > 0 ? '${widget.current}' : '',
   );
 
-  int get _amount => int.tryParse(_controller.text.trim()) ?? 0;
+  // Same ceiling the sync file accepts (syncMaxCount).
+  int get _amount =>
+      (int.tryParse(_controller.text.trim()) ?? 0).clamp(0, syncMaxCount);
 
   @override
   void dispose() {
@@ -83,7 +86,10 @@ class _CountEntryDialogState extends State<CountEntryDialog> {
               controller: _controller,
               autofocus: true,
               keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+                LengthLimitingTextInputFormatter('$syncMaxCount'.length),
+              ],
               textInputAction: TextInputAction.done,
               onChanged: (_) => setState(() {}),
               onSubmitted: (_) => _submit(),

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/date_utils.dart';
 import '../../../data/providers.dart';
+import '../../../data/sync/sync_format.dart' show syncMaxTaskTitle;
 import '../../../shared/theme.dart';
 import '../../../ui_metin.dart';
 import '../task_edit_dialog.dart';
@@ -131,6 +133,7 @@ class _QuickAddState extends ConsumerState<_QuickAdd> {
     return TextField(
       controller: _controller,
       focusNode: _focus,
+      inputFormatters: [LengthLimitingTextInputFormatter(syncMaxTaskTitle)],
       textInputAction: TextInputAction.done,
       onSubmitted: (_) => _submit(),
       style: const TextStyle(fontSize: 16),
