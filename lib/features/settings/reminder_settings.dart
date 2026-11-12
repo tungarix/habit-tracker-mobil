@@ -10,6 +10,9 @@ abstract class ReminderSettings {
   Future<int?> readHour();
 
   Future<void> writeHour(int? hour);
+
+  /// False when the system blocks notifications, so the reminder can never show.
+  Future<bool> izinVar();
 }
 
 /// Default implementation: keeps the value for the life of the process only.
@@ -23,6 +26,9 @@ class InMemoryReminderSettings implements ReminderSettings {
 
   @override
   Future<void> writeHour(int? hour) async => _hour = hour;
+
+  @override
+  Future<bool> izinVar() async => true;
 }
 
 final reminderSettingsProvider = Provider<ReminderSettings>(

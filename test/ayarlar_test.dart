@@ -34,6 +34,12 @@ class SahteDosyaServisi implements BackupFileService {
   }
 }
 
+/// Notifications blocked by the system.
+class _IzinsizHatirlatici extends InMemoryReminderSettings {
+  @override
+  Future<bool> izinVar() async => false;
+}
+
 /// Lets async work finish and animations (dialog, snackbar) play out in two
 /// frames; pumpAndSettle runs hundreds of frames and crashes this machine's test engine.
 Future<void> kisaBekle(WidgetTester tester) async {
@@ -236,6 +242,21 @@ void main() {
     await tester.tap(find.byType(SwitchListTile));
     await kisaBekle(tester);
     expect(await hatirlatici.readHour(), isNull);
+
+    await temizle(tester);
+  });
+
+  testWidgets('reminder on but notifications blocked: the row says it will not show', (
+    tester,
+  ) async {
+    hatirlatici = _IzinsizHatirlatici();
+    final db = await bellekDb();
+    await ekraniAc(tester, db);
+
+    await tester.tap(find.byType(SwitchListTile));
+    await kisaBekle(tester);
+    expect(find.text(Metin.hatirlaticiIzinYok), findsOneWidget);
+    expect(find.text(Metin.hatirlaticiAcik('20')), findsNothing);
 
     await temizle(tester);
   });

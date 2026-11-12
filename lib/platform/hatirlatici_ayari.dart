@@ -9,7 +9,7 @@ class AndroidReminderSettings implements ReminderSettings {
   AndroidReminderSettings(this.db, this.bildirim);
 
   final AppDatabase db;
-  final YerelBildirimler bildirim;
+  final BildirimKapisi bildirim;
 
   @override
   Future<int?> readHour() => hatirlaticiSaati(db);
@@ -17,9 +17,14 @@ class AndroidReminderSettings implements ReminderSettings {
   @override
   Future<void> writeHour(int? hour) async {
     final saat = hour?.clamp(0, 23);
+    final oncekiKapali = await readHour() == null;
     await db.setSetting(AppConstants.reminderHourKey, saat == null ? '' : '$saat');
-    // Turning the reminder on is the user action that asks for the permission.
-    if (saat != null) await bildirim.izinIste();
+    // Turning the reminder on is the user action that asks for the permission; moving the hour
+    // slider must not ask again on every tick.
+    if (saat != null && oncekiKapali) await bildirim.izinIste();
     await yanEtkileriYenile(db, bildirim);
   }
+
+  @override
+  Future<bool> izinVar() => bildirim.bildirimIzniVar();
 }

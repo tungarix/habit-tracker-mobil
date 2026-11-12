@@ -507,6 +507,9 @@ abstract final class Metin {
   static const hatirlaticiKapali = 'Kapalı.';
   static String hatirlaticiAcik(String hh) =>
       'Bekleyen alışkanlık varsa saat $hh\'da bildirim gösterir.';
+  static const hatirlaticiIzinYok =
+      'Bildirim izni kapalı, hatırlatıcı gelmeyecek. Telefon ayarlarından '
+      'bu uygulamanın bildirimlerine izin ver.';
   static String hatirlaticiSesli(int h) => 'saat $h';
 
   // --- Güncelleme -----------------------------------------------------------

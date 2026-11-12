@@ -20,6 +20,9 @@ class _Sayac implements BildirimKapisi {
 
   @override
   Future<void> izinIste() async {}
+
+  @override
+  Future<bool> bildirimIzniVar() async => true;
 }
 
 void main() {

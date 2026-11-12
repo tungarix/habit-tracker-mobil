@@ -33,6 +33,9 @@ abstract class BildirimKapisi {
 
   /// Asks for the notification permissions; call it from a user action (first timer / reminder).
   Future<void> izinIste();
+
+  /// Whether notifications are allowed right now (false: denied or switched off in system settings).
+  Future<bool> bildirimIzniVar();
 }
 
 String hatirlaticiGovdesi(int? bekleyen) => bekleyen == null
@@ -75,6 +78,12 @@ class YerelBildirimler implements BildirimKapisi {
     // Android 13+ grants USE_EXACT_ALARM by itself; on 12 a settings screen opens.
     if (!(await a?.canScheduleExactNotifications() ?? true)) await a?.requestExactAlarmsPermission();
     await _durumOku();
+  }
+
+  @override
+  Future<bool> bildirimIzniVar() async {
+    await _durumOku();
+    return durum.value.bildirimIzni != false;
   }
 
   static const _hatirlaticiDetay = NotificationDetails(

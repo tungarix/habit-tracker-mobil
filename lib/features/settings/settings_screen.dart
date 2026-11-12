@@ -27,14 +27,18 @@ class SettingsScreen extends ConsumerStatefulWidget {
   ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
 }
 
-class _SettingsScreenState extends ConsumerState<SettingsScreen> {
+class _SettingsScreenState extends ConsumerState<SettingsScreen>
+    with WidgetsBindingObserver {
   bool _busy = false;
   bool _reminderLoaded = false;
   int? _reminderHour;
+  bool _reminderIzinVar = true;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _izniOku();
     ref.read(reminderSettingsProvider).readHour().then((h) {
       if (mounted) {
         setState(() {
@@ -43,6 +47,23 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         });
       }
     });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  // The user may grant the permission in system settings and come back.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) _izniOku();
+  }
+
+  Future<void> _izniOku() async {
+    final izin = await ref.read(reminderSettingsProvider).izinVar();
+    if (mounted && izin != _reminderIzinVar) setState(() => _reminderIzinVar = izin);
   }
 
   void _toast(String message) {
@@ -153,6 +174,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   Future<void> _setReminder(int? hour) async {
     setState(() => _reminderHour = hour);
     await ref.read(reminderSettingsProvider).writeHour(hour);
+    await _izniOku();
   }
 
   @override
@@ -240,6 +262,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   _ReminderRow(
                     loaded: _reminderLoaded,
                     hour: _reminderHour,
+                    izinVar: _reminderIzinVar,
                     onChanged: _setReminder,
                   ),
                 ],
@@ -348,10 +371,12 @@ class _DayStartRow extends ConsumerWidget {
 class _ReminderRow extends StatelessWidget {
   final bool loaded;
   final int? hour;
+  final bool izinVar;
   final ValueChanged<int?> onChanged;
   const _ReminderRow({
     required this.loaded,
     required this.hour,
+    required this.izinVar,
     required this.onChanged,
   });
 
@@ -364,7 +389,11 @@ class _ReminderRow extends StatelessWidget {
           secondary: const Icon(Icons.notifications_outlined),
           title: const Text(Metin.aksamHatirlaticisi),
           subtitle: Text(
-            h == null ? Metin.hatirlaticiKapali : Metin.hatirlaticiAcik(_hh(h)),
+            h == null
+                ? Metin.hatirlaticiKapali
+                : !izinVar
+                ? Metin.hatirlaticiIzinYok
+                : Metin.hatirlaticiAcik(_hh(h)),
           ),
           value: h != null,
           onChanged: loaded
