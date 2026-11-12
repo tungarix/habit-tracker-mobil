@@ -524,6 +524,13 @@ abstract final class Metin {
   static const guncellemeIndiriliyor = 'İndiriliyor ve doğrulanıyor...';
   static const guncellemeKurulumAcildi =
       'Doğrulandı. Android\'in kurulum penceresinde onayla.';
+  /// PackageInstaller status code (never 0 = success).
+  static String guncellemeKurulumSonucu(int durum) => switch (durum) {
+    3 => 'Kurulum iptal edildi.',
+    6 => 'Telefonda yeterli yer yok, kurulmadı.',
+    7 => 'Yeni sürümün imzası kurulu uygulamayla uyuşmuyor, kurulmadı.',
+    _ => 'Kurulum tamamlanamadı (kod $durum).',
+  };
   static const guncellemeIlkBaslik = 'Güncellemeler denetlensin mi?';
   static const guncellemeIlkGovde =
       'Uygulama günde en çok bir kez GitHub\'a bağlanıp yeni sürüm olup '

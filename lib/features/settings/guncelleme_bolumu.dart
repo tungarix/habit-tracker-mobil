@@ -61,6 +61,19 @@ class _GuncellemeBolumuState extends ConsumerState<GuncellemeBolumu> {
   String? _durum; // transient status / error line
   bool _mesgul = false;
 
+  @override
+  void initState() {
+    super.initState();
+    // Without this a cancelled / failed install (signature mismatch...) would leave the
+    // "install dialog opened" line on screen forever.
+    ref.read(kopruProvider)?.kurulumSonucuDinle(_kurulumSonucu);
+  }
+
+  void _kurulumSonucu(int durum, String? mesaj) {
+    if (!mounted || durum == 0) return;
+    setState(() => _durum = Metin.guncellemeKurulumSonucu(durum));
+  }
+
   Future<void> _calis(Future<void> Function() gorev) async {
     setState(() => _mesgul = true);
     try {

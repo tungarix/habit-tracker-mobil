@@ -81,6 +81,7 @@ class _SahteKopru implements Kopru {
   String tur;
   bool izin;
   int izinAcildi = 0;
+  void Function(int, String?)? sonuc;
   final kurulan = <(String, String)>[];
 
   @override
@@ -97,7 +98,7 @@ class _SahteKopru implements Kopru {
   Future<void> apkKur(String yol, String ozet) async =>
       kurulan.add((yol, ozet));
   @override
-  void kurulumSonucuDinle(void Function(int, String?) f) {}
+  void kurulumSonucuDinle(void Function(int, String?) f) => sonuc = f;
   @override
   Future<GelenDosya?> bekleyenDosya() async => null;
   @override
@@ -254,6 +255,32 @@ void main() {
       await kisaBekle(tester);
       expect(k.kurulan.length, 1);
       expect(find.text(Metin.guncellemeKurulumAcildi), findsOneWidget);
+    });
+
+    testWidgets('installer failure replaces the "install dialog opened" line',
+        (tester) async {
+      final (k, _) = await kur(
+        tester,
+        const SettingsScreen(),
+        ag: _SahteAg(sonuc: 'yeni'),
+      );
+      await dokun(tester, Metin.guncellemeSimdiDenetle);
+      await tester.ensureVisible(find.text(Metin.guncellemeIndirKur));
+      await tester.pump();
+      await tester.tap(find.text(Metin.guncellemeIndirKur));
+      for (var i = 0; i < 20 && k.kurulan.isEmpty; i++) {
+        await tester.runAsync(
+          () => Future<void>.delayed(const Duration(milliseconds: 100)),
+        );
+        await tester.pump();
+      }
+      await kisaBekle(tester);
+      expect(find.text(Metin.guncellemeKurulumAcildi), findsOneWidget);
+      expect(k.sonuc, isNotNull, reason: 'bölüm kurulum sonucunu dinlemeli');
+      k.sonuc!(7, 'INSTALL_FAILED_UPDATE_INCOMPATIBLE');
+      await kisaBekle(tester);
+      expect(find.text(Metin.guncellemeKurulumAcildi), findsNothing);
+      expect(find.text(Metin.guncellemeKurulumSonucu(7)), findsOneWidget);
     });
 
     testWidgets('first launch: asks once, "No" means no network at all',
