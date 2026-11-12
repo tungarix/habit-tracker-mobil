@@ -177,7 +177,10 @@ class Ag {
       } on FileSystemException {
         // silinemeyen kısmi dosya bir sonraki indirmede ezilir
       }
-      if (e is FileSystemException) throw GuncellemeHatasi('izin_yok', e.runtimeType.toString());
+      // ENOSPC (Android/Linux) ve ERROR_DISK_FULL (Windows): izin değil, yer sorunu.
+      if (e is FileSystemException && (e.osError?.errorCode == 28 || e.osError?.errorCode == 112)) {
+        throw const GuncellemeHatasi('depo_dolu', 'depolama dolu');
+      }
       throw _agHatasi(e);
     }
   }

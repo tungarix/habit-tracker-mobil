@@ -296,7 +296,7 @@ abstract final class Metin {
 
   // Stats
   static const istatistik = 'İstatistik';
-  static const istatistikAlt = 'Serilerin, oranların ve mood ilişkin';
+  static const istatistikAlt = 'Seriler, oranlar ve mood ilişkisi';
   static const alisanliklar = 'Alışkanlıklar';
   static const moodTamamlama = 'Mood ↔ Tamamlama';
   static const toplamIsaret = 'Toplam ✓';
@@ -550,6 +550,7 @@ abstract final class Metin {
     'wifi_gerek' => 'İndirme Wi-Fi\'ı bekliyor.',
     'izin_yok' =>
       'Bu uygulamaya kurulum izni ver, sonra geri dönüp tekrar dene.',
+    'depo_dolu' => 'Telefonda yeterli yer yok, güncelleme indirilemedi.',
     'ozet_uyusmuyor' || 'ozet_bulunamadi' =>
       'İndirilen dosya doğrulanamadı, kurulmadı.',
     'ag_hatasi' || 'limit' => 'İndirme tamamlanamadı, sonra tekrar dene.',

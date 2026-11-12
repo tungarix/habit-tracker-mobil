@@ -345,6 +345,17 @@ void main() {
       expect(d.listSync(), isEmpty);
     });
 
+    test('depolama dolu: izin değil depo_dolu kodu', () async {
+      final d = await gecici();
+      await IOOverrides.runWithIOOverrides(
+        () => expectLater(
+          ag().indir(adres('/dl/Habit-Tracker-0.4.0.apk'), File('${d.path}/x.apk'), yeniApk.length),
+          throwsA(isA<GuncellemeHatasi>().having((e) => e.kod, 'kod', 'depo_dolu')),
+        ),
+        _DoluDepo(),
+      );
+    });
+
     test('doğru dosya indirilir ve doğrulanır', () async {
       final g = await hizmet();
       await g.denetle();
@@ -523,4 +534,23 @@ void main() {
       }
     });
   });
+}
+
+base class _DoluDepo extends IOOverrides {
+  @override
+  File createFile(String path) => path.endsWith('.part') ? _DoluDosya(path) : super.createFile(path);
+}
+
+/// openWrite ENOSPC ile düşen .part dosyası (gerçek diski doldurmadan).
+class _DoluDosya implements File {
+  _DoluDosya(this.path);
+  @override
+  final String path;
+  @override
+  IOSink openWrite({FileMode mode = FileMode.write, Encoding encoding = utf8}) =>
+      throw FileSystemException('yazılamadı', path, const OSError('No space left on device', 28));
+  @override
+  Future<bool> exists() async => false;
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }

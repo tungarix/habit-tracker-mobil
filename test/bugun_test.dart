@@ -106,6 +106,29 @@ void main() {
     await temizle(tester);
   });
 
+  testWidgets('Bugün: ruh hali notu kaydedilir, pencere kapanırken hata atmaz', (tester) async {
+    telefonBoyutu(tester, yukseklik: 2400);
+    final db = await bellekDb();
+    await uygulamaAc(tester, db);
+
+    final mutlu = find.byIcon(Mood.mutlu.icon);
+    await tester.ensureVisible(mutlu);
+    await tester.tap(mutlu);
+    await bekle(tester);
+    await tester.tap(find.byTooltip(Metin.notTooltip));
+    await bekle(tester, 3);
+    await tester.enterText(find.descendant(of: find.byType(AlertDialog), matching: find.byType(TextField)), 'iyi gündü');
+    await tester.tap(find.text(Metin.kaydet));
+    await tester.pump(const Duration(milliseconds: 20));
+    // DB yazımı bitip _editNote devam ederken kapanış animasyonu sürüyor: denetleyici hâlâ dinleniyor.
+    await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 100)));
+    await tester.pump(const Duration(milliseconds: 20));
+    await bekle(tester);
+    expect((await tester.runAsync(() => db.watchAllMoods().first))!.single.note, 'iyi gündü');
+    expect(tester.takeException(), isNull);
+    await temizle(tester);
+  });
+
   testWidgets('Bugün: hızlı görev eklenir ve listede görünür', (tester) async {
     telefonBoyutu(tester, yukseklik: 2400);
     final db = await bellekDb();

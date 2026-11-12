@@ -69,26 +69,29 @@ class OdakDeposu {
   /// Ends the run at [simdi]: records a session when it lasted at least [odakEnKisaKayitSn] seconds
   /// and clears the state. [tamamlandi] true caps the length at the plan (the alarm may fire late).
   /// Returns the recorded seconds, or null when nothing was recorded.
-  Future<int?> bitir(DateTime simdi, {required int dayStartHour, bool tamamlandi = false}) async {
-    final s = await oku();
-    if (s == null) return null;
-    await temizle();
-    final bitis = tamamlandi ? s.bitis : simdi;
-    var sure = bitis.difference(s.baslangic).inSeconds;
-    if (sure > s.planSn) sure = s.planSn;
-    if (sure < odakEnKisaKayitSn) return null;
-    // The task may have been deleted while the timer ran.
-    final gorevVar = s.taskId != null &&
-        await (db.select(db.tasks)..where((t) => t.id.equals(s.taskId!))).getSingleOrNull() != null;
-    await db.insertSession(
-      kind: s.tur.storageName,
-      startedAt: s.baslangic,
-      endedAt: bitis,
-      durationS: sure,
-      // The tracking day the run began on, not the one it ended on.
-      day: formatYmd(dayOf(s.baslangic, dayStartHour: dayStartHour)),
-      taskId: gorevVar ? s.taskId : null,
-    );
-    return sure;
-  }
+  Future<int?> bitir(DateTime simdi, {required int dayStartHour, bool tamamlandi = false}) =>
+      // One transaction: a failed insert (or a killed process) must not leave the state cleared
+      // with no session row, which would lose the finished run for good.
+      db.transaction(() async {
+        final s = await oku();
+        if (s == null) return null;
+        await temizle();
+        final bitis = tamamlandi ? s.bitis : simdi;
+        var sure = bitis.difference(s.baslangic).inSeconds;
+        if (sure > s.planSn) sure = s.planSn;
+        if (sure < odakEnKisaKayitSn) return null;
+        // The task may have been deleted while the timer ran.
+        final gorevVar = s.taskId != null &&
+            await (db.select(db.tasks)..where((t) => t.id.equals(s.taskId!))).getSingleOrNull() != null;
+        await db.insertSession(
+          kind: s.tur.storageName,
+          startedAt: s.baslangic,
+          endedAt: bitis,
+          durationS: sure,
+          // The tracking day the run began on, not the one it ended on.
+          day: formatYmd(dayOf(s.baslangic, dayStartHour: dayStartHour)),
+          taskId: gorevVar ? s.taskId : null,
+        );
+        return sure;
+      });
 }

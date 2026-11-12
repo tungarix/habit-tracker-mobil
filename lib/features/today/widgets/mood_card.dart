@@ -93,29 +93,9 @@ class MoodCard extends ConsumerWidget {
     String dateStr,
     String? current,
   ) async {
-    final controller = TextEditingController(text: current ?? '');
     final result = await showDialog<String>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text(Metin.notBaslik),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          maxLength: 200,
-          decoration: const InputDecoration(hintText: Metin.notIpucu),
-          onSubmitted: (v) => Navigator.pop(context, v),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text(Metin.iptal),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, controller.text),
-            child: const Text(Metin.kaydet),
-          ),
-        ],
-      ),
+      builder: (context) => _NotDiyalogu(baslangic: current ?? ''),
     );
     if (result != null) {
       final trimmed = result.trim();
@@ -123,8 +103,43 @@ class MoodCard extends ConsumerWidget {
           .read(habitRepositoryProvider)
           .setMoodNote(dateStr, trimmed.isEmpty ? null : trimmed);
     }
-    controller.dispose();
   }
+}
+
+/// Owns its controller: disposing it right after showDialog returns would run while the route is
+/// still animating out, with the TextField still listening.
+class _NotDiyalogu extends StatefulWidget {
+  const _NotDiyalogu({required this.baslangic});
+  final String baslangic;
+
+  @override
+  State<_NotDiyalogu> createState() => _NotDiyaloguState();
+}
+
+class _NotDiyaloguState extends State<_NotDiyalogu> {
+  late final controller = TextEditingController(text: widget.baslangic);
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => AlertDialog(
+    title: const Text(Metin.notBaslik),
+    content: TextField(
+      controller: controller,
+      autofocus: true,
+      maxLength: 200,
+      decoration: const InputDecoration(hintText: Metin.notIpucu),
+      onSubmitted: (v) => Navigator.pop(context, v),
+    ),
+    actions: [
+      TextButton(onPressed: () => Navigator.pop(context), child: const Text(Metin.iptal)),
+      FilledButton(onPressed: () => Navigator.pop(context, controller.text), child: const Text(Metin.kaydet)),
+    ],
+  );
 }
 
 /// Compact 30-day mood line. Small on purpose: with no history it must not

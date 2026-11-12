@@ -130,6 +130,20 @@ void main() {
       expect(await depo.bitir(b.add(const Duration(hours: 3)), dayStartHour: 4, tamamlandi: true), 1500);
     });
 
+    test('a failing insert keeps the running state so the run is not lost', () async {
+      final b = DateTime(2026, 11, 10, 22, 0);
+      await depo.baslat(OdakCalisiyor(baslangic: b, tur: SessionKind.focus, planSn: 1500));
+      await db.customStatement(
+        "CREATE TRIGGER sessions_fail BEFORE INSERT ON focus_sessions BEGIN SELECT RAISE(ABORT, 'disk'); END",
+      );
+      await expectLater(
+        depo.bitir(b.add(const Duration(minutes: 25)), dayStartHour: 4, tamamlandi: true),
+        throwsA(anything),
+      );
+      expect(await depo.oku(), isNotNull);
+      expect(await db.getAllSessions(), isEmpty);
+    });
+
     test('nothing running: no row', () async {
       expect(await depo.bitir(DateTime(2026, 11, 10), dayStartHour: 4), isNull);
       expect(await db.getAllSessions(), isEmpty);
