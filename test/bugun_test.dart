@@ -33,6 +33,30 @@ void main() {
     await temizle(tester);
   });
 
+  testWidgets('Bugün: hedefin altındaki kısmi miktar "devam ediyor" okunur', (
+    tester,
+  ) async {
+    telefonBoyutu(tester);
+    final handle = tester.ensureSemantics();
+    final db = await bellekDb();
+    await aliskanlikEkle(db, 'Su', kind: 'count', target: 8);
+    await uygulamaAc(tester, db);
+
+    await tester.longPress(find.text('Su'));
+    await bekle(tester);
+    await tester.enterText(find.byType(TextField), '3');
+    await tester.tap(find.text(Metin.kaydet));
+    await bekle(tester);
+
+    expect(
+      find.bySemanticsLabel(RegExp(r'^Su, \d+ \S+: devam ediyor, 3 / 8')),
+      findsOneWidget,
+    );
+
+    handle.dispose();
+    await temizle(tester);
+  });
+
   testWidgets('Bugün: sayılabilir alışkanlıkta uzun basış miktar sorar', (
     tester,
   ) async {

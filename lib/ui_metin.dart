@@ -46,6 +46,8 @@ abstract final class Metin {
   static String seriGun(int n) => '$n gün seri';
   static String seriNotu(String ad, int n) => '$ad: $n gün seri, devam!';
 
+  static const durumSuruyor = 'devam ediyor';
+
   /// Spoken/visible state of one day mark.
   static String durum(EntryStatus? s) => switch (s) {
     EntryStatus.done => 'yapıldı',

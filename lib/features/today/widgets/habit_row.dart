@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/date_utils.dart';
+import '../../../core/enums.dart';
 import '../../../core/stats.dart';
 import '../../../data/database/database.dart';
 import '../../../data/models/habit_today_view.dart';
@@ -36,7 +37,10 @@ class _HabitRowState extends ConsumerState<HabitRow> {
     final value =
         ref.watch(valuesByHabitProvider)[habit.id]?[formatYmd(day)] ?? 0;
 
-    final state = Metin.durum(view.status);
+    // Bugün bitmedi: hedefin altındaki kısmi miktar "yapılmadı" diye okunmaz.
+    final state = count && value > 0 && view.status == EntryStatus.missed
+        ? Metin.durumSuruyor
+        : Metin.durum(view.status);
     final label = count
         ? '${Metin.hucre(habit.name, day, state)}, $value / ${habit.target}'
         : Metin.hucre(habit.name, day, state);
