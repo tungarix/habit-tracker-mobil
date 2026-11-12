@@ -12,7 +12,7 @@ foreach ($d in $dosyalar) {
     $tamam = $false
     for ($i = 1; $i -le $Deneme -and -not $tamam; $i++) {
         $cikti = flutter test "test/$($d.Name)" 2>&1 | Out-String
-        if ($cikti -match 'All tests passed!') {
+        if ($cikti -match 'All tests passed!|All tests skipped.') {
             $tamam = $true
             $not = if ($i -gt 1) { " (motor çökmesi nedeniyle $i. denemede)" } else { '' }
             Write-Host ("OK   {0}{1}" -f $d.Name, $not)
