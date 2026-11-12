@@ -106,6 +106,13 @@ void main() {
       expect((await db.getAllSessions()).single.day, '2026-11-10');
     });
 
+    test('a run that crosses the day start belongs to the day it began on', () async {
+      final b = DateTime(2026, 11, 11, 3, 50);
+      await depo.baslat(OdakCalisiyor(baslangic: b, tur: SessionKind.focus, planSn: 1500));
+      await depo.bitir(b.add(const Duration(minutes: 20)), dayStartHour: 4);
+      expect((await db.getAllSessions()).single.day, '2026-11-10');
+    });
+
     test('under a minute is dropped, but the state is still cleared', () async {
       final b = DateTime(2026, 11, 10, 22, 0);
       await depo.baslat(OdakCalisiyor(baslangic: b, tur: SessionKind.focus, planSn: 1500));

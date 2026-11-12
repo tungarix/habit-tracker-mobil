@@ -85,7 +85,8 @@ class OdakDeposu {
       startedAt: s.baslangic,
       endedAt: bitis,
       durationS: sure,
-      day: formatYmd(dayOf(bitis, dayStartHour: dayStartHour)),
+      // The tracking day the run began on, not the one it ended on.
+      day: formatYmd(dayOf(s.baslangic, dayStartHour: dayStartHour)),
       taskId: gorevVar ? s.taskId : null,
     );
     return sure;
