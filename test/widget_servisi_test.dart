@@ -14,6 +14,12 @@ void main() {
     test('accepts exactly habitwidget://isaretle?id=N', () {
       expect(widgetUriCoz(Uri.parse('habitwidget://isaretle?id=5')), 5);
     });
+    test('reads the list day, ignores a malformed one', () {
+      expect(widgetUriGun(Uri.parse('habitwidget://isaretle?id=5&gun=2026-11-10')), '2026-11-10');
+      expect(widgetUriGun(Uri.parse('habitwidget://isaretle?id=5')), isNull);
+      expect(widgetUriGun(Uri.parse('habitwidget://isaretle?id=5&gun=dun')), isNull);
+      expect(widgetUriGun(null), isNull);
+    });
     test('rejects everything else', () {
       for (final u in [
         null,
@@ -82,6 +88,15 @@ void main() {
       await db.setEntryStatus(id, '2026-11-10', EntryStatus.missed);
       expect(await widgetIsaretle(db, id, sabah), isTrue);
       expect((await db.getEntry(id, '2026-11-10'))!.status, EntryStatus.done);
+    });
+
+    test('a tap on a row drawn for an earlier day does not mark today', () async {
+      final id = await ekle('Kitap');
+      // The list still shows 2026-11-09; at 04:20 on the 10th the tracking day is already the 10th.
+      final yeniGun = DateTime(2026, 11, 10, 4, 20);
+      expect(await widgetIsaretle(db, id, yeniGun, gun: '2026-11-09'), isFalse);
+      expect(await db.getAllEntries(), isEmpty);
+      expect(await widgetIsaretle(db, id, yeniGun, gun: '2026-11-10'), isTrue);
     });
 
     test('before the day start hour the check goes to the previous tracking day', () async {

@@ -81,7 +81,12 @@ class MainActivity : FlutterActivity() {
                         )
                         sonuc.success(null)
                     }
-                    "apkKur" -> apkKur(cagri.argument<String>("yol"), cagri.argument<String>("ozet"), sonuc)
+                    "apkKur" -> {
+                        // Copy + fsync + SHA-256 of a large APK must not run on the main thread (ANR).
+                        val yol = cagri.argument<String>("yol")
+                        val ozet = cagri.argument<String>("ozet")
+                        Thread { apkKur(yol, ozet, sonuc) }.start()
+                    }
                     "bekleyenDosya" -> {
                         dartHazir = true
                         val b = bekleyen
@@ -144,11 +149,11 @@ class MainActivity : FlutterActivity() {
                 oturum.commit(PendingIntent.getBroadcast(this, id, niyet, bayrak).intentSender)
                 commitEdildi = true
             }
-            sonuc.success(null)
+            runOnUiThread { sonuc.success(null) }
         } catch (e: Exception) {
             // After commit the session may sit in the user's confirm dialog: abandon only on pre-commit failure.
             if (oturumNo >= 0 && !commitEdildi) try { packageManager.packageInstaller.abandonSession(oturumNo) } catch (_: Exception) {}
-            sonuc.error("kurulum", e.message ?: e.javaClass.simpleName, null)
+            runOnUiThread { sonuc.error("kurulum", e.message ?: e.javaClass.simpleName, null) }
         }
     }
 
@@ -177,18 +182,19 @@ class MainActivity : FlutterActivity() {
                 val sinir = 16 * 1024 * 1024
                 val cikti = ByteArrayOutputStream()
                 contentResolver.openInputStream(uri).use { girdi ->
-                    if (girdi == null) throw IllegalStateException("dosya açılamadı")
+                    if (girdi == null) throw OkumaHatasi("Dosya açılamadı.")
                     val tampon = ByteArray(64 * 1024)
                     while (true) {
                         val n = girdi.read(tampon)
                         if (n < 0) break
                         cikti.write(tampon, 0, n)
-                        if (cikti.size() > sinir) throw IllegalStateException("dosya çok büyük (en çok 16 MB)")
+                        if (cikti.size() > sinir) throw OkumaHatasi("Dosya çok büyük (en çok 16 MB).")
                     }
                 }
                 mapOf("bayt" to cikti.toByteArray())
             } catch (e: Throwable) {
-                mapOf("hata" to (e.message ?: e.javaClass.simpleName))
+                // Shown to the user as is: only our own Turkish messages, never a raw system exception text.
+                mapOf("hata" to if (e is OkumaHatasi) e.message!! else "Dosya okunamadı.")
             }
             runOnUiThread {
                 if (dartHazir && kanal != null) kanal?.invokeMethod("dosyaGeldi", sonuc) else bekleyen = sonuc
@@ -196,3 +202,5 @@ class MainActivity : FlutterActivity() {
         }.start()
     }
 }
+
+private class OkumaHatasi(mesaj: String) : Exception(mesaj)

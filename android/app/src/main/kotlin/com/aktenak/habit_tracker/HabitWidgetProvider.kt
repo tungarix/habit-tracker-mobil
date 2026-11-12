@@ -18,7 +18,9 @@ import org.json.JSONException
  * Dart (lib/platform/widget_servisi.dart) stores the list in the home_widget preferences:
  *  - widget_items: JSON [{"id":5,"ad":"Kitap","yapildi":false}, ...]
  *  - widget_bitis: epoch ms when the tracking day ends (after that the list is stale)
- * A row tap sends habitwidget://isaretle?id=<id> to the Dart background callback.
+ *  - widget_gun: the tracking day (YYYY-AA-GG) the list was drawn for
+ * A row tap sends habitwidget://isaretle?id=<id>&gun=<widget_gun> to the Dart background callback,
+ * which ignores it when that day is no longer today.
  */
 class HabitWidgetProvider : HomeWidgetProvider() {
     override fun onUpdate(
@@ -29,6 +31,7 @@ class HabitWidgetProvider : HomeWidgetProvider() {
     ) {
         val bitis = widgetData.getLong("widget_bitis", 0L)
         val bayat = bitis != 0L && System.currentTimeMillis() >= bitis
+        val gun = widgetData.getString("widget_gun", null)
         val kayitlar = try {
             JSONArray(widgetData.getString("widget_items", "[]"))
         } catch (_: JSONException) {
@@ -71,7 +74,7 @@ class HabitWidgetProvider : HomeWidgetProvider() {
                 )
                 v.setOnClickPendingIntent(
                     SATIRLAR[i],
-                    HomeWidgetBackgroundIntent.getBroadcast(context, Uri.parse("habitwidget://isaretle?id=${kayit.optInt("id")}")),
+                    HomeWidgetBackgroundIntent.getBroadcast(context, Uri.parse("habitwidget://isaretle?id=${kayit.optInt("id")}" + (if (gun != null) "&gun=$gun" else ""))),
                 )
             }
             val fazla = n - SATIRLAR.size

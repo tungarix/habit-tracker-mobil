@@ -1,6 +1,6 @@
 // Home-screen widget glue (home_widget). The Kotlin side is HabitWidgetProvider.
 //
-// Flow: the widget row tap sends `habitwidget://isaretle?id=<habitId>` to [widgetArkaPlan] (a Dart
+// Flow: the widget row tap sends `habitwidget://isaretle?id=<habitId>&gun=<YYYY-AA-GG>` to [widgetArkaPlan] (a Dart
 // background callback), which writes the check through the shared database connection
 // (db_baglanti.dart), then refreshes the widget and the reminder plan. Writing goes through the
 // same single database server isolate as the UI, so a UI that is open sees it right away.
@@ -37,10 +37,20 @@ int? widgetUriCoz(Uri? uri) {
   return (id != null && id > 0) ? id : null;
 }
 
+/// The tracking day the tapped list was drawn for (`gun`), or null when absent/malformed
+/// (a widget drawn by an older build has none).
+String? widgetUriGun(Uri? uri) {
+  final g = uri?.queryParameters['gun'];
+  return (g != null && RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(g)) ? g : null;
+}
+
 /// Writes ✓ for [habitId] on today's tracking day. Returns whether anything was written: unknown,
 /// archived or not-scheduled-today habits and already-✓ cells are left alone (a tap never undoes).
-Future<bool> widgetIsaretle(AppDatabase db, int habitId, DateTime simdi) async {
+/// [gun]: the day the tapped list showed. The widget list can outlive its day (it refreshes about
+/// every 30 minutes), so a tap on yesterday's row must not mark today's cell.
+Future<bool> widgetIsaretle(AppDatabase db, int habitId, DateTime simdi, {String? gun}) async {
   final ozet = await bugunOzeti(db, simdi);
+  if (gun != null && gun != formatYmd(ozet.gun)) return false;
   final satir = ozet.satirlar.where((s) => s.id == habitId).firstOrNull;
   if (satir == null || satir.yapildi) return false;
   // A count habit records its full target, so the cell reads ✓ in the app as well.
@@ -52,6 +62,7 @@ Future<bool> widgetIsaretle(AppDatabase db, int habitId, DateTime simdi) async {
 Future<void> widgetiYenile(BugunOzeti ozet) async {
   await HomeWidget.saveWidgetData<String>('widget_items', widgetOgeleriJson(ozet.satirlar));
   await HomeWidget.saveWidgetData<int>('widget_bitis', widgetBitisMs(ozet));
+  await HomeWidget.saveWidgetData<String>('widget_gun', formatYmd(ozet.gun));
   await HomeWidget.updateWidget(qualifiedAndroidName: widgetSaglayici);
 }
 
@@ -67,7 +78,7 @@ Future<void> widgetArkaPlan(Uri? uri) async {
   if (id == null) return;
   final db = AppDatabase.forTesting(dbBaglantisi());
   try {
-    await widgetIsaretle(db, id, DateTime.now());
+    await widgetIsaretle(db, id, DateTime.now(), gun: widgetUriGun(uri));
     final bildirim = YerelBildirimler();
     await bildirim.baslat();
     await yanEtkileriYenile(db, bildirim);
