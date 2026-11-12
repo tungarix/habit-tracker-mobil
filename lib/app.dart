@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'data/providers.dart';
 import 'features/habits/habits_screen.dart';
 import 'features/monthly/monthly_screen.dart';
 import 'features/settings/guncelleme_bolumu.dart';
@@ -43,12 +44,13 @@ class Kabuk extends ConsumerStatefulWidget {
   ConsumerState<Kabuk> createState() => _KabukState();
 }
 
-class _KabukState extends ConsumerState<Kabuk> {
+class _KabukState extends ConsumerState<Kabuk> with WidgetsBindingObserver {
   int _index = 0; // the app opens on Bugün
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     final kopru = ref.read(kopruProvider);
     if (kopru == null) return;
     kopru.dosyaDinle(_gelen);
@@ -63,6 +65,19 @@ class _KabukState extends ConsumerState<Kabuk> {
         // The update check is optional; never block the app.
       }
     });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  // todayProvider's rollover Timer runs on the monotonic clock, which stands still while the
+  // phone sleeps: after a night in the background the day would still be yesterday's.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) ref.invalidate(todayProvider);
   }
 
   /// A .habitsync opened from a file manager / share sheet: validate, confirm, merge.
