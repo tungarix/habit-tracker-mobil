@@ -133,13 +133,15 @@ void main() {
   testWidgets('Bugün: notu olan ruh haline tekrar dokunmak onay ister', (tester) async {
     telefonBoyutu(tester, yukseklik: 2400);
     final db = await bellekDb();
-    await uygulamaAc(tester, db);
+    // Takvim günü değil takip günü (04:00 öncesi dünkü gün); gerçek saatten bağımsız.
+    final bugun = DateTime(2026, 3, 10);
+    await uygulamaAc(tester, db, overrides: [todayProvider.overrideWithValue(bugun)]);
 
     final mutlu = find.byIcon(Mood.mutlu.icon);
     await tester.ensureVisible(mutlu);
     await tester.tap(mutlu);
     await bekle(tester);
-    await tester.runAsync(() => db.setMoodNote(formatYmd(DateTime.now()), 'iyi gündü'));
+    await tester.runAsync(() => db.setMoodNote(formatYmd(bugun), 'iyi gündü'));
     await bekle(tester);
 
     await tester.tap(mutlu);
