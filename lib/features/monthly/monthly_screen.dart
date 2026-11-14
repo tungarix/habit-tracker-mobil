@@ -449,11 +449,12 @@ class _MoodLine extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = AppColors.of(context);
     final moodByDate = ref.watch(moodByDateProvider);
-    final moods = List<int?>.generate(days, (i) {
+    final moods = List<double?>.generate(days, (i) {
       final date = formatYmd(DateTime(month.year, month.month, i + 1));
-      return moodByDate[date]?.mood;
+      final m = moodByDate[date]?.mood;
+      return m == null ? null : Mood.puanOf(m);
     });
-    final recorded = moods.whereType<int>().length;
+    final recorded = moods.whereType<double>().length;
 
     return SizedBox(
       width: days * cellW,
@@ -489,7 +490,7 @@ class _MoodLine extends ConsumerWidget {
 }
 
 class _MoodLinePainter extends CustomPainter {
-  final List<int?> moods;
+  final List<double?> moods;
   final double cellW;
   final Color lineColor;
   final Color gridColor;
@@ -511,7 +512,7 @@ class _MoodLinePainter extends CustomPainter {
     const bottom = 8.0;
     final plotH = size.height - top - bottom;
 
-    double yFor(int mood) => top + plotH * (1 - (mood - 1) / 4);
+    double yFor(double mood) => top + plotH * (1 - (mood - 1) / 4);
     double xFor(int i) => i * cellW + cellW / 2;
 
     // Light horizontal guides for each mood level.
@@ -519,7 +520,7 @@ class _MoodLinePainter extends CustomPainter {
       ..color = gridColor.withValues(alpha: 0.55)
       ..strokeWidth = 1;
     for (var m = 1; m <= 5; m++) {
-      final y = yFor(m);
+      final y = yFor(m.toDouble());
       canvas.drawLine(Offset(0, y), Offset(size.width, y), gridPaint);
     }
 

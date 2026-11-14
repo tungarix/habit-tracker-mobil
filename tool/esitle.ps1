@@ -35,8 +35,8 @@ Get-ChildItem "$Kaynak\lib\data\sync" -Filter *.dart | ForEach-Object { $liste.A
 $liste.Add('docs/senkron.md')
 # providers.dart bunu içe aktarır (saf Dart, arayüz yok).
 Get-ChildItem "$Kaynak\lib\data\models" -Filter *.dart | ForEach-Object { $liste.Add("lib/data/models/$($_.Name)") }
-# wifi_*: masaüstü sunucusunun testleri (lib/core/wifi_sync mobile kopyalanmaz); mobilin kendi wifi_* testlerini ezmesin.
-Get-ChildItem "$Kaynak\test" -Filter *.dart | Where-Object Name -notlike 'wifi_*' | Where-Object {
+# tepsi_menu_test: masaüstü tepsi kaynağını okur, mobilde yok. wifi_*: masaüstü sunucusunun testleri (lib/core/wifi_sync mobile kopyalanmaz); mobilin kendi wifi_* testlerini ezmesin.
+Get-ChildItem "$Kaynak\test" -Filter *.dart | Where-Object { $_.Name -notlike 'wifi_*' -and $_.Name -ne 'tepsi_menu_test.dart' } | Where-Object {
     $_.Name -eq 'helpers.dart' -or -not (Select-String -Path $_.FullName -Pattern $testHaric -Quiet)
 } | ForEach-Object { $liste.Add("test/$($_.Name)") }
 

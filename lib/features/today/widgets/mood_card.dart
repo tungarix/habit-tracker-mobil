@@ -128,7 +128,7 @@ class MoodCard extends ConsumerWidget {
 }) {
   final values = [
     for (final d in lastDays(endDay, days))
-      if (moodByDate[formatYmd(d)] case final e?) e.mood,
+      if (moodByDate[formatYmd(d)] case final e?) Mood.puanOf(e.mood),
   ];
   if (values.isEmpty) return (ortalama: 0, n: 0);
   return (
@@ -217,7 +217,7 @@ class MoodStrip extends StatelessWidget {
     final colors = AppColors.of(context);
     final series = [
       for (final day in lastDays(endDay, days))
-        moodByDate[formatYmd(day)]?.mood,
+        if (moodByDate[formatYmd(day)]?.mood case final m?) Mood.puanOf(m) else null,
     ];
     final recorded = series.where((m) => m != null).length;
 
@@ -254,7 +254,7 @@ class MoodStrip extends StatelessWidget {
 }
 
 class _MoodStripPainter extends CustomPainter {
-  final List<int?> series;
+  final List<double?> series;
   final Color line;
   final Color grid;
 
@@ -272,13 +272,13 @@ class _MoodStripPainter extends CustomPainter {
     if (n == 0) return;
 
     double xAt(int i) => n == 1 ? size.width / 2 : size.width * (i / (n - 1));
-    double yAt(int mood) => pad + plotH * (1 - (mood - 1) / 4);
+    double yAt(double mood) => pad + plotH * (1 - (mood - 1) / 4);
 
     // Faint rails at the extremes only: enough to read height, no clutter.
     final gridPaint = Paint()
       ..color = grid.withValues(alpha: 0.5)
       ..strokeWidth = 1;
-    for (final mood in [1, 5]) {
+    for (final mood in [1.0, 5.0]) {
       final y = yAt(mood);
       canvas.drawLine(Offset(0, y), Offset(size.width, y), gridPaint);
     }
@@ -329,7 +329,7 @@ class MoodPicker extends StatelessWidget {
     final colors = AppColors.of(context);
     return Row(
       children: [
-        for (final mood in Mood.values) ...[
+        for (final mood in Mood.sirali) ...[
           Expanded(
             child: Semantics(
       container: true,
@@ -377,7 +377,8 @@ class MoodPicker extends StatelessWidget {
               ),
             ),
           ),
-          if (mood != Mood.values.last) const SizedBox(width: 4),
+          // Boşluk yok: altı düğme dar telefonda (320dp) 48dp dokunma alanını korusun.
+
         ],
       ],
     );
