@@ -81,6 +81,16 @@ abstract final class Metin {
   static String moodCizgi(int kayit) =>
       'Son 30 gün ruh hali çizgisi, $kayit kayıt';
 
+  static const gecmis = 'Geçmiş';
+  static const moodGecmisiBaslik = 'Ruh hali geçmişi';
+  static const moodGecmisiYok = 'Henüz ruh hali kaydı yok.';
+  static const notYok = 'Not yok';
+  static const notuSil = 'Notu sil';
+  static const gunSilBaslik = 'Bu günün kaydı silinsin mi?';
+  static const gunSilGovde = 'Ruh hali ve notu silinir. Bu geri alınamaz.';
+  static String moodOrtalama(double ort, int n) =>
+      'Son 30 gün ortalaması: ${ort.toStringAsFixed(1).replaceAll('.', ',')} / 5 ($n kayıt)';
+
   // --- Bugün: focus timer ---------------------------------------------------
   static const odak = 'Odak';
   static String gunUstUste(int n) => '$n gün üst üste';

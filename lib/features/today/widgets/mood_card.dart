@@ -8,6 +8,7 @@ import '../../../data/providers.dart';
 import '../../../shared/onay.dart';
 import '../../../shared/theme.dart';
 import '../../../ui_metin.dart';
+import '../mood_gecmisi_screen.dart';
 
 /// Mood: one tap for today, 30-day line underneath.
 class MoodCard extends ConsumerWidget {
@@ -20,6 +21,7 @@ class MoodCard extends ConsumerWidget {
     final selected = Mood.fromValue(entry?.mood);
     final moodByDate = ref.watch(moodByDateProvider);
     final colors = AppColors.of(context);
+    final ort = moodOrtalamasi(moodByDate, day);
 
     return Card(
       child: Padding(
@@ -41,6 +43,16 @@ class MoodCard extends ConsumerWidget {
                     ),
                   ),
                 ),
+                IconButton(
+                  tooltip: Metin.gecmis,
+                  icon: Icon(Icons.history, color: colors.textDim),
+                  onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute<void>(
+                      builder: (_) => const MoodGecmisiScreen(),
+                    ),
+                  ),
+                ),
                 if (selected != null)
                   IconButton(
                     tooltip: Metin.notTooltip,
@@ -51,7 +63,7 @@ class MoodCard extends ConsumerWidget {
                       color: colors.textDim,
                     ),
                     onPressed: () =>
-                        _editNote(context, ref, formatYmd(day), entry?.note),
+                        notDuzenle(context, ref, formatYmd(day), entry?.note),
                   )
                 else
                   const SizedBox(height: 48),
@@ -93,36 +105,64 @@ class MoodCard extends ConsumerWidget {
             ],
             const SizedBox(height: 10),
             MoodStrip(moodByDate: moodByDate, endDay: day),
+            if (ort.n > 0)
+              Padding(
+                padding: const EdgeInsets.only(top: 6),
+                child: Text(
+                  Metin.moodOrtalama(ort.ortalama, ort.n),
+                  style: TextStyle(fontSize: 12, color: colors.textDim),
+                ),
+              ),
           ],
         ),
       ),
     );
   }
+}
 
-  Future<void> _editNote(
-    BuildContext context,
-    WidgetRef ref,
-    String dateStr,
-    String? current,
-  ) async {
-    final result = await showDialog<String>(
-      context: context,
-      builder: (context) => _NotDiyalogu(baslangic: current ?? ''),
-    );
-    if (result != null) {
-      final trimmed = result.trim();
-      await ref
-          .read(habitRepositoryProvider)
-          .setMoodNote(dateStr, trimmed.isEmpty ? null : trimmed);
-    }
+/// Son [days] takip gününde kayıtlı ruh hali değerlerinin ortalaması ve kayıt sayısı.
+({double ortalama, int n}) moodOrtalamasi(
+  Map<String, MoodEntry> moodByDate,
+  DateTime endDay, {
+  int days = 30,
+}) {
+  final values = [
+    for (final d in lastDays(endDay, days))
+      if (moodByDate[formatYmd(d)] case final e?) e.mood,
+  ];
+  if (values.isEmpty) return (ortalama: 0, n: 0);
+  return (
+    ortalama: values.reduce((a, b) => a + b) / values.length,
+    n: values.length,
+  );
+}
+
+/// Not penceresini açar; boş/boşluk metin notu siler. Bugün kartı ve geçmiş ekranı ortak kullanır.
+Future<void> notDuzenle(
+  BuildContext context,
+  WidgetRef ref,
+  String dateStr,
+  String? current, {
+  String baslik = Metin.notBaslik,
+}) async {
+  final result = await showDialog<String>(
+    context: context,
+    builder: (context) => _NotDiyalogu(baslangic: current ?? '', baslik: baslik),
+  );
+  if (result != null) {
+    final trimmed = result.trim();
+    await ref
+        .read(habitRepositoryProvider)
+        .setMoodNote(dateStr, trimmed.isEmpty ? null : trimmed);
   }
 }
 
 /// Owns its controller: disposing it right after showDialog returns would run while the route is
 /// still animating out, with the TextField still listening.
 class _NotDiyalogu extends StatefulWidget {
-  const _NotDiyalogu({required this.baslangic});
+  const _NotDiyalogu({required this.baslangic, required this.baslik});
   final String baslangic;
+  final String baslik;
 
   @override
   State<_NotDiyalogu> createState() => _NotDiyaloguState();
@@ -139,7 +179,7 @@ class _NotDiyaloguState extends State<_NotDiyalogu> {
 
   @override
   Widget build(BuildContext context) => AlertDialog(
-    title: const Text(Metin.notBaslik),
+    title: Text(widget.baslik),
     content: TextField(
       controller: controller,
       autofocus: true,
@@ -148,6 +188,8 @@ class _NotDiyaloguState extends State<_NotDiyalogu> {
       onSubmitted: (v) => Navigator.pop(context, v),
     ),
     actions: [
+      if (widget.baslangic.isNotEmpty)
+        TextButton(onPressed: () => Navigator.pop(context, ''), child: const Text(Metin.notuSil)),
       TextButton(onPressed: () => Navigator.pop(context), child: const Text(Metin.iptal)),
       FilledButton(onPressed: () => Navigator.pop(context, controller.text), child: const Text(Metin.kaydet)),
     ],
