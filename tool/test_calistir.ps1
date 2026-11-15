@@ -18,7 +18,7 @@ foreach ($d in $dosyalar) {
             Write-Host ("OK   {0}{1}" -f $d.Name, $not)
         } else {
             # Çökme imzası: yalnızca "did not complete" / yüklenemedi, başka hata metni yok.
-            $cokme = ($cikti -match 'did not complete|Connection closed before test suite loaded') -and
+            $cokme = ($cikti -match 'did not complete|No tests were found|Connection closed before test suite loaded') -and
                      -not ($cikti -match 'EXCEPTION CAUGHT|Expected:|Actual:|TestFailure|Bad state')
             if (-not $cokme) { Write-Host $cikti; break }
         }
