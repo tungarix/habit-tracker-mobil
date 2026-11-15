@@ -1,5 +1,6 @@
 import 'package:aktenak_habit_tracker/core/date_utils.dart';
 import 'package:aktenak_habit_tracker/data/database/database.dart';
+import 'package:aktenak_habit_tracker/data/providers.dart';
 import 'package:aktenak_habit_tracker/ui_metin.dart';
 import 'package:drift/drift.dart' show Value;
 import 'package:flutter/material.dart';
@@ -10,36 +11,47 @@ import 'ui_yardimci.dart';
 /// WCAG-style checks on the rendered screens (PLAN: AA, 48 dp, labelled
 /// targets), in both themes, with a full Bugün screen and a task list.
 void main() {
+  // Sabit an: gece 02:00 (takip günü bir önceki gün); gerçek saate bağlı değil.
+  final bugun = dayOf(DateTime(2026, 3, 10, 2));
   for (final koyu in [false, true]) {
     testWidgets('erişilebilirlik kuralları: ${koyu ? "koyu" : "açık"} tema', (
       tester,
     ) async {
       telefonBoyutu(tester);
-      tester.platformDispatcher.platformBrightnessTestValue =
-          koyu ? Brightness.dark : Brightness.light;
+      tester.platformDispatcher.platformBrightnessTestValue = koyu
+          ? Brightness.dark
+          : Brightness.light;
       addTearDown(tester.platformDispatcher.clearPlatformBrightnessTestValue);
       final handle = tester.ensureSemantics();
 
       final db = await bellekDb();
       await aliskanlikEkle(db, 'Kitap');
       await aliskanlikEkle(db, 'Su', kind: 'count', target: 8);
-      final yarin = DateTime.now().add(const Duration(days: 1));
+      final yarin = DateTime(bugun.year, bugun.month, bugun.day + 1);
       await db.insertTask(
         TasksCompanion.insert(
           title: 'Fatura',
-          dueDay: Value(formatYmd(DateTime(yarin.year, yarin.month, yarin.day))),
+          dueDay: Value(
+            formatYmd(DateTime(yarin.year, yarin.month, yarin.day)),
+          ),
         ),
       );
-      await uygulamaAc(tester, db);
+      await uygulamaAc(
+        tester,
+        db,
+        overrides: [todayProvider.overrideWithValue(bugun)],
+      );
 
       await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
       await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
       await expectLater(tester, meetsGuideline(textContrastGuideline));
 
-      await tester.tap(find.descendant(
-        of: find.byType(NavigationBar),
-        matching: find.text(Metin.sekmeGorevler),
-      ));
+      await tester.tap(
+        find.descendant(
+          of: find.byType(NavigationBar),
+          matching: find.text(Metin.sekmeGorevler),
+        ),
+      );
       await bekle(tester);
       await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
       await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
@@ -56,8 +68,9 @@ void main() {
       'erişilebilirlik: Aylık, İstatistik, Alışkanlıklar, Ayarlar (${koyu ? "koyu" : "açık"})',
       (tester) async {
         telefonBoyutu(tester, yukseklik: 900);
-        tester.platformDispatcher.platformBrightnessTestValue =
-            koyu ? Brightness.dark : Brightness.light;
+        tester.platformDispatcher.platformBrightnessTestValue = koyu
+            ? Brightness.dark
+            : Brightness.light;
         addTearDown(tester.platformDispatcher.clearPlatformBrightnessTestValue);
         final handle = tester.ensureSemantics();
         final db = await bellekDb();
@@ -67,17 +80,22 @@ void main() {
 
         Future<void> denetle({bool dokunma = true}) async {
           if (dokunma) {
-            await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
+            await expectLater(
+              tester,
+              meetsGuideline(androidTapTargetGuideline),
+            );
           }
           await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
           await expectLater(tester, meetsGuideline(textContrastGuideline));
         }
 
         Future<void> sekme(String ad) async {
-          await tester.tap(find.descendant(
-            of: find.byType(NavigationBar),
-            matching: find.text(ad),
-          ));
+          await tester.tap(
+            find.descendant(
+              of: find.byType(NavigationBar),
+              matching: find.text(ad),
+            ),
+          );
           await bekle(tester);
         }
 
@@ -113,16 +131,22 @@ void main() {
       for (final rt in tester.widgetList<RichText>(find.byType(RichText))) {
         final boyut = rt.text.style?.fontSize;
         if (boyut != null) {
-          expect(boyut, greaterThanOrEqualTo(12), reason: rt.text.toPlainText());
+          expect(
+            boyut,
+            greaterThanOrEqualTo(12),
+            reason: rt.text.toPlainText(),
+          );
         }
       }
     }
 
     Future<void> sekme(String ad) async {
-      await tester.tap(find.descendant(
-        of: find.byType(NavigationBar),
-        matching: find.text(ad),
-      ));
+      await tester.tap(
+        find.descendant(
+          of: find.byType(NavigationBar),
+          matching: find.text(ad),
+        ),
+      );
       await bekle(tester);
       tara();
     }
